@@ -1,5 +1,6 @@
-import { Newspaper, Users, Trophy, Settings } from "lucide-react";
+import { Newspaper, Users, Trophy, Settings, Building2, Calendar } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
+import { useAuth } from "@/hooks/useAuth";
 import {
   Sidebar,
   SidebarContent,
@@ -12,22 +13,25 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
-const navItems = [
-  { title: "Dashboard / News", url: "/app/dashboard", icon: Newspaper },
-  { title: "My Club", url: "/app/my-club", icon: Users },
-  { title: "Tournaments", url: "/app/tournaments", icon: Trophy },
-  { title: "Admin Settings", url: "/app/admin", icon: Settings },
-];
-
 export function AppSidebar() {
-  const { state } = useSidebar();
-  const collapsed = state === "collapsed";
+  const { state }            = useSidebar();
+  const { isAdmin, isCoach } = useAuth();
+  const collapsed            = state === "collapsed";
+
+  const navItems = [
+    { title: "Početna",    url: "/app/dashboard",  icon: Newspaper,  show: true    },
+    { title: "Moj klub",  url: "/app/my-club",     icon: Users,      show: isCoach },
+    { title: "Svi klubovi", url: "/app/clubs",    icon: Building2,  show: true    },
+    { title: "Turniri",   url: "/app/tournaments", icon: Trophy,     show: true    },
+    { title: "Kalendar",  url: "/app/calendar",    icon: Calendar,   show: true    },
+    { title: "Admin",     url: "/app/admin",       icon: Settings,   show: isAdmin },
+  ].filter((i) => i.show);
 
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          <SidebarGroupLabel>Navigacija</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {navItems.map((item) => (
