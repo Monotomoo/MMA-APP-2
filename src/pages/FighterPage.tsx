@@ -1,10 +1,13 @@
 import { useParams, Link } from "react-router-dom";
+import { useState } from "react";
 import { useFighter } from "@/hooks/useFighter";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { ArrowLeft, Trophy, Calendar } from "lucide-react";
+import { ArrowLeft, Trophy, Calendar, FileText, Upload, CheckCircle, XCircle, Clock, AlertCircle } from "lucide-react";
+import { DOC_LABELS, DOC_DESC, DocType, FighterDocument, uploadFighterDoc, updateDocStatus } from "@/lib/demo-data";
 
 function initials(name: string) {
   return name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
@@ -35,11 +38,49 @@ function fmt(iso: string | null) {
   return new Intl.DateTimeFormat("hr-HR", { day: "numeric", month: "long", year: "numeric" }).format(new Date(iso));
 }
 
+const DOC_STATUS_CONFIG = {
+  approved: { label: "Odobreno",    icon: CheckCircle,   className: "text-green-600 bg-green-500/10 border-green-500/30" },
+  pending:  { label: "Na čekanju",  icon: Clock,         className: "text-yellow-600 bg-yellow-500/10 border-yellow-500/30" },
+  rejected: { label: "Odbijeno",    icon: XCircle,       className: "text-red-500 bg-red-500/10 border-red-500/30" },
+  missing:  { label: "Nedostaje",   icon: AlertCircle,   className: "text-muted-foreground bg-muted/50 border-border" },
+};
+
 export default function FighterPage() {
   const { id } = useParams<{ id: string }>();
-  const { fighter, profile, bouts, registrations } = useFighter(id!);
+  const { fighter, profile, bouts, registrations, documents: initialDocs } = useFighter(id!);
   const { profile: authProfile } = useAuth();
   const isOwnProfile = authProfile?.id === id;
+  const isAdmin = authProfile?.role === "admin";
+  const isCoach = authProfile?.role === "coach";
+  const canUpload = isOwnProfile || isCoach || isAdmin;
+
+  const [docs, setDocs] = useState(initialDocs);
+  const [rejectNotes, setRejectNotes] = useState<Record<string, string>>({});
+
+  function handleUpload(doc_type: DocType) {
+    const fakeName = `${doc_type}_${profile?.full_name?.split(" ")[1]?.toLowerCase() ?? "borac"}.pdf`;
+    uploadFighterDoc(id!, doc_type, fakeName);
+    setDocs((prev) => prev.map((d) =>
+      d.doc_type === doc_type
+        ? { ...d, file_name: fakeName, uploaded_at: new Date().toISOString(), status: "pending", approved_by: null, approved_at: null, notes: null }
+        : d
+    ));
+  }
+
+  function handleApprove(doc: FighterDocument) {
+    updateDocStatus(doc.id.startsWith("doc-missing") ? `doc-${Date.now()}` : doc.id, "approved", authProfile!.id);
+    setDocs((prev) => prev.map((d) =>
+      d.doc_type === doc.doc_type ? { ...d, status: "approved", approved_by: authProfile!.id, approved_at: new Date().toISOString(), notes: null } : d
+    ));
+  }
+
+  function handleReject(doc: FighterDocument) {
+    const note = rejectNotes[doc.doc_type] || "Dokument nije ispravan.";
+    updateDocStatus(doc.id, "rejected", authProfile!.id, note);
+    setDocs((prev) => prev.map((d) =>
+      d.doc_type === doc.doc_type ? { ...d, status: "rejected", approved_by: authProfile!.id, approved_at: new Date().toISOString(), notes: note } : d
+    ));
+  }
 
   if (!fighter || !profile) {
     return (
@@ -148,6 +189,66 @@ export default function FighterPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Documents */}
+      {(canUpload || isAdmin) && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              Dokumenti
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {docs.map((doc) => {
+              const cfg = DOC_STATUS_CONFIG[doc.status];
+              const Icon = cfg.icon;
+              return (
+                <div key={doc.doc_type} className="rounded-lg border bg-card p-4 space-y-3">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="font-semibold text-sm">{DOC_LABELS[doc.doc_type]}</p>
+                        <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full border ${cfg.className}`}>
+                          <Icon className="h-3 w-3" />
+                          {cfg.label}
+                        </span>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-0.5">{DOC_DESC[doc.doc_type]}</p>
+                      {doc.file_name && (
+                        <p className="text-xs text-muted-foreground mt-1 truncate">
+                          📎 {doc.file_name}
+                        </p>
+                      )}
+                      {doc.notes && (
+                        <p className="text-xs text-red-500 mt-1">{doc.notes}</p>
+                      )}
+                    </div>
+                    {/* Upload button — fighter/coach */}
+                    {canUpload && (doc.status === "missing" || doc.status === "rejected") && (
+                      <Button size="sm" variant="outline" onClick={() => handleUpload(doc.doc_type)} className="shrink-0">
+                        <Upload className="h-3.5 w-3.5 mr-1" />
+                        Učitaj
+                      </Button>
+                    )}
+                  </div>
+                  {/* Admin approve/reject */}
+                  {isAdmin && doc.status === "pending" && (
+                    <div className="flex items-center gap-2 pt-1 border-t">
+                      <Button size="sm" variant="outline" className="text-green-600 border-green-500/40 hover:bg-green-500/10" onClick={() => handleApprove(doc)}>
+                        <CheckCircle className="h-3.5 w-3.5 mr-1" /> Odobri
+                      </Button>
+                      <Button size="sm" variant="outline" className="text-red-500 border-red-500/40 hover:bg-red-500/10" onClick={() => handleReject(doc)}>
+                        <XCircle className="h-3.5 w-3.5 mr-1" /> Odbij
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </CardContent>
+        </Card>
+      )}
 
       {/* My Registrations — own profile only */}
       {isOwnProfile && (

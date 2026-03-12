@@ -1,4 +1,4 @@
-import { FIGHTERS, PROFILES, BOUTS, TOURNAMENTS, REGISTRATIONS, getFighterName } from "@/lib/demo-data";
+import { FIGHTERS, PROFILES, BOUTS, TOURNAMENTS, REGISTRATIONS, getFighterName, getFighterDocs } from "@/lib/demo-data";
 
 export function useFighter(id: string) {
   const fighter = FIGHTERS.find((f) => f.id === id) ?? null;
@@ -36,5 +36,7 @@ export function useFighter(id: string) {
     })
     .sort((a, b) => (b.tournament_date ?? "").localeCompare(a.tournament_date ?? ""));
 
-  return { fighter, profile, bouts, registrations };
+  const documents = getFighterDocs(id);
+
+  return { fighter, profile, bouts, registrations, documents };
 }

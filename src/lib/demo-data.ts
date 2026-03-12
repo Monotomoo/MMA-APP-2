@@ -85,6 +85,31 @@ export interface Announcement {
   created_at: string;
 }
 
+export type DocType   = "pristupnica" | "lijecnicka_svjedodzba";
+export type DocStatus = "missing" | "pending" | "approved" | "rejected";
+
+export interface FighterDocument {
+  id: string;
+  fighter_id: string;
+  doc_type: DocType;
+  file_name: string | null;
+  uploaded_at: string | null;
+  status: DocStatus;
+  approved_by: string | null;
+  approved_at: string | null;
+  notes: string | null;
+}
+
+export const DOC_LABELS: Record<DocType, string> = {
+  pristupnica:          "Pristupnica",
+  lijecnicka_svjedodzba: "Liječnička svjedodžba",
+};
+
+export const DOC_DESC: Record<DocType, string> = {
+  pristupnica:          "Popunjen i potpisan obrazac pristupnice u klub",
+  lijecnicka_svjedodzba: "Važeća liječnička svjedodžba o sposobnosti za bavljenje borilačkim sportovima",
+};
+
 export interface TrainingSession {
   id: string;
   club_id: string;
@@ -289,6 +314,75 @@ export const TRAINING_SESSIONS: TrainingSession[] = [
   { id: "ts-19", club_id: "club-4", title: "Full MMA Sparring",       session_type: "sparring",     day_of_week: 6, start_time: "10:00", end_time: "11:30", location: "SKZ Dvorana",   notes: null, is_active: true },
   { id: "ts-20", club_id: "club-4", title: "Cardio & Conditioning",   session_type: "conditioning", day_of_week: 1, start_time: "06:30", end_time: "08:00", location: "SKZ Dvorana",   notes: null, is_active: true },
 ];
+
+export const FIGHTER_DOCUMENTS: FighterDocument[] = [
+  // Fighter 3 — both docs approved
+  { id: "doc-1", fighter_id: "3", doc_type: "pristupnica",          file_name: "pristupnica_horvat.pdf",     uploaded_at: "2026-01-10T10:00:00Z", status: "approved", approved_by: "1", approved_at: "2026-01-11T09:00:00Z", notes: null },
+  { id: "doc-2", fighter_id: "3", doc_type: "lijecnicka_svjedodzba", file_name: "lijecnicka_horvat.pdf",     uploaded_at: "2026-01-10T10:05:00Z", status: "approved", approved_by: "1", approved_at: "2026-01-11T09:05:00Z", notes: null },
+  // Fighter 4 — pristupnica approved, lijecnicka pending
+  { id: "doc-3", fighter_id: "4", doc_type: "pristupnica",          file_name: "pristupnica_peric.pdf",     uploaded_at: "2026-01-12T11:00:00Z", status: "approved", approved_by: "1", approved_at: "2026-01-13T10:00:00Z", notes: null },
+  { id: "doc-4", fighter_id: "4", doc_type: "lijecnicka_svjedodzba", file_name: "lijecnicka_peric.pdf",     uploaded_at: "2026-03-10T14:00:00Z", status: "pending",  approved_by: null, approved_at: null, notes: null },
+  // Fighter 5 — pristupnica pending, lijecnicka missing
+  { id: "doc-5", fighter_id: "5", doc_type: "pristupnica",          file_name: "pristupnica_busic.pdf",     uploaded_at: "2026-03-11T09:00:00Z", status: "pending",  approved_by: null, approved_at: null, notes: null },
+  // Fighter 6 — both approved
+  { id: "doc-6", fighter_id: "6", doc_type: "pristupnica",          file_name: "pristupnica_simunic.pdf",   uploaded_at: "2025-09-01T08:00:00Z", status: "approved", approved_by: "1", approved_at: "2025-09-02T08:00:00Z", notes: null },
+  { id: "doc-7", fighter_id: "6", doc_type: "lijecnicka_svjedodzba", file_name: "lijecnicka_simunic.pdf",  uploaded_at: "2025-09-01T08:10:00Z", status: "approved", approved_by: "1", approved_at: "2025-09-02T08:10:00Z", notes: null },
+  // Fighter 7 — lijecnicka rejected
+  { id: "doc-8", fighter_id: "7", doc_type: "pristupnica",          file_name: "pristupnica_kovac.pdf",     uploaded_at: "2026-02-01T10:00:00Z", status: "approved", approved_by: "1", approved_at: "2026-02-02T09:00:00Z", notes: null },
+  { id: "doc-9", fighter_id: "7", doc_type: "lijecnicka_svjedodzba", file_name: "lijecnicka_kovac.pdf",    uploaded_at: "2026-02-01T10:10:00Z", status: "rejected", approved_by: "1", approved_at: "2026-02-02T09:10:00Z", notes: "Dokument je istekao. Molimo učitajte važeći." },
+];
+
+export function getFighterDocs(fighter_id: string): FighterDocument[] {
+  const existing = FIGHTER_DOCUMENTS.filter((d) => d.fighter_id === fighter_id);
+  const types: DocType[] = ["pristupnica", "lijecnicka_svjedodzba"];
+  return types.map((type) => {
+    return existing.find((d) => d.doc_type === type) ?? {
+      id: `doc-missing-${fighter_id}-${type}`,
+      fighter_id,
+      doc_type: type,
+      file_name: null,
+      uploaded_at: null,
+      status: "missing" as DocStatus,
+      approved_by: null,
+      approved_at: null,
+      notes: null,
+    };
+  });
+}
+
+export function uploadFighterDoc(fighter_id: string, doc_type: DocType, file_name: string): void {
+  const existing = FIGHTER_DOCUMENTS.find((d) => d.fighter_id === fighter_id && d.doc_type === doc_type);
+  if (existing) {
+    existing.file_name = file_name;
+    existing.uploaded_at = new Date().toISOString();
+    existing.status = "pending";
+    existing.approved_by = null;
+    existing.approved_at = null;
+    existing.notes = null;
+  } else {
+    FIGHTER_DOCUMENTS.push({
+      id: `doc-${Date.now()}`,
+      fighter_id,
+      doc_type,
+      file_name,
+      uploaded_at: new Date().toISOString(),
+      status: "pending",
+      approved_by: null,
+      approved_at: null,
+      notes: null,
+    });
+  }
+}
+
+export function updateDocStatus(id: string, status: "approved" | "rejected", approvedBy: string, notes?: string): void {
+  const d = FIGHTER_DOCUMENTS.find((d) => d.id === id);
+  if (d) {
+    d.status = status;
+    d.approved_by = approvedBy;
+    d.approved_at = new Date().toISOString();
+    d.notes = notes ?? null;
+  }
+}
 
 export function getRegistration(
   tournamentId: string,
