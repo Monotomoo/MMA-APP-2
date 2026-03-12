@@ -156,8 +156,14 @@ export const CLUBS: Club[] = [
     mission: "U Crows klubu, naša misija je inspirirati i osnažiti pojedince svih dobnih skupina da prihvate transformacijsku snagu sporta. Posvećeni smo stvaranju gostoljubivog i inkluzivnog okruženja gdje svatko ima priliku razviti svoj sportski potencijal i postići svoje osobne ciljeve. Naša misija se proteže dalje od samo treniranja sportaša; posvećeni smo razvijanju ljubavi prema sportu za cijeli život te promicanju fizičkog, mentalnog i emocionalnog blagostanja u našoj zajednici.",
     created_at: "2026-02-28T10:10:00Z" 
   },
-  { id: "club-3", name: "MMA Klub Ban",     city: "Split",  logo_url: null,                          coach_id: "11", created_at: "2026-02-28T10:20:00Z" },
-  { id: "club-4", name: "Sport Klub Zagreb",city: "Zagreb", logo_url: null,                          coach_id: "16", created_at: "2026-02-28T10:30:00Z" },
+  { id: "club-3", name: "MMA Klub Ban",       city: "Split",   logo_url: null, coach_id: "11", created_at: "2026-02-28T10:20:00Z" },
+  { id: "club-4", name: "Sport Klub Zagreb",  city: "Zagreb",  logo_url: null, coach_id: "16", created_at: "2026-02-28T10:30:00Z" },
+  { id: "club-5", name: "Fight Academy Rijeka", city: "Rijeka",  logo_url: null, coach_id: null, description: "Vodeći MMA klub na kvarnerskoj rivijeri. Specijalizirani za grappling i submission wrestling.", created_at: "2026-01-15T09:00:00Z" },
+  { id: "club-6", name: "Osijek Fight Team",   city: "Osijek",  logo_url: null, coach_id: null, description: "Najjači MMA tim u Slavoniji s dugogodišnjom tradicijom u borilačkim sportovima.", created_at: "2026-01-20T09:00:00Z" },
+  { id: "club-7", name: "MMA Dubrovnik",        city: "Dubrovnik", logo_url: null, coach_id: null, description: "Elitni klub s fokusom na striking i muay thai. Redovito nastupaju na međunarodnim turnirima.", created_at: "2026-01-25T09:00:00Z" },
+  { id: "club-8", name: "Varaždin Warriors",    city: "Varaždin", logo_url: null, coach_id: null, description: "Klub s jakom tradicijom u hrvanju i sambu. Podloga za mnoge reprezentativce.", created_at: "2026-02-01T09:00:00Z" },
+  { id: "club-9", name: "Zadar MMA Centar",     city: "Zadar",   logo_url: null, coach_id: null, description: "Moderni MMA centar s vrhunskom opremom. Fokus na razvoj mladih boraca.", created_at: "2026-02-10T09:00:00Z" },
+  { id: "club-10", name: "Pula Combat Club",    city: "Pula",    logo_url: null, coach_id: null, description: "Najstariji MMA klub u Istri. Bogata povijest u kickboxingu i slobodnoj borbi.", created_at: "2026-02-15T09:00:00Z" },
 ];
 
 export const FIGHTERS: Fighter[] = [
