@@ -24,6 +24,9 @@ export interface Club {
   city: string | null;
   logo_url: string | null;
   coach_id: string | null;
+  description?: string | null;
+  history?: string | null;
+  mission?: string | null;
   created_at: string;
 }
 
@@ -116,37 +119,75 @@ export function getFighterName(id: string | null): string {
 // ─── Seed Data ────────────────────────────────────────────────────────────────
 
 export const PROFILES: Profile[] = [
-  { id: "1",  full_name: "Tomo (Admin)",      role: "admin",   avatar_url: null,                  created_at: "2026-02-28T10:00:00Z" },
-  { id: "2",  full_name: "Dejan Gunjavić",   role: "coach",   avatar_url: null,                  created_at: "2026-02-28T10:01:00Z" },
-  { id: "3",  full_name: "Ivan Horvat",       role: "fighter", avatar_url: "/fighters/ivan.png",  created_at: "2026-02-28T10:02:00Z" },
-  { id: "4",  full_name: "Marko Perić",       role: "fighter", avatar_url: "/fighters/marko.png", created_at: "2026-02-28T10:03:00Z" },
-  { id: "5",  full_name: "Ante Bušić",        role: "fighter", avatar_url: "/fighters/ante.png",  created_at: "2026-02-28T10:04:00Z" },
-  { id: "6",  full_name: "Luka Šimunić",      role: "fighter", avatar_url: "/fighters/luka.png",  created_at: "2026-02-28T10:05:00Z" },
-  { id: "7",  full_name: "Domagoj Kovač",     role: "fighter", avatar_url: null,                  created_at: "2026-02-28T10:06:00Z" },
-  { id: "8",  full_name: "Josip Blažević",    role: "fighter", avatar_url: null,                  created_at: "2026-02-28T10:07:00Z" },
-  { id: "9",  full_name: "Nikola Rukavina",   role: "fighter", avatar_url: null,                  created_at: "2026-02-28T10:08:00Z" },
-  { id: "10", full_name: "Bruno Šarić",       role: "fighter", avatar_url: null,                  created_at: "2026-02-28T10:09:00Z" },
+  { id: "1",  full_name: "Tomo (Admin)",        role: "admin",   avatar_url: null, created_at: "2026-02-28T10:00:00Z" },
+  { id: "2",  full_name: "Dejan Gunjavić",     role: "coach",   avatar_url: null, created_at: "2026-02-28T10:01:00Z" },
+  { id: "3",  full_name: "Ivan Horvat",         role: "fighter", avatar_url: null, created_at: "2026-02-28T10:02:00Z" },
+  { id: "4",  full_name: "Marko Perić",         role: "fighter", avatar_url: null, created_at: "2026-02-28T10:03:00Z" },
+  { id: "5",  full_name: "Ante Bušić",          role: "fighter", avatar_url: null, created_at: "2026-02-28T10:04:00Z" },
+  { id: "6",  full_name: "Luka Šimunić",        role: "fighter", avatar_url: null, created_at: "2026-02-28T10:05:00Z" },
+  { id: "7",  full_name: "Domagoj Kovač",       role: "fighter", avatar_url: null, created_at: "2026-02-28T10:06:00Z" },
+  { id: "8",  full_name: "Josip Blažević",      role: "fighter", avatar_url: null, created_at: "2026-02-28T10:07:00Z" },
+  { id: "9",  full_name: "Nikola Rukavina",     role: "fighter", avatar_url: null, created_at: "2026-02-28T10:08:00Z" },
+  { id: "10", full_name: "Bruno Šarić",         role: "fighter", avatar_url: null, created_at: "2026-02-28T10:09:00Z" },
+  // MMA Klub Ban
+  { id: "11", full_name: "Bernard Ban",         role: "coach",   avatar_url: null, created_at: "2026-02-28T10:10:00Z" },
+  { id: "12", full_name: "Filip Banov",         role: "fighter", avatar_url: null, created_at: "2026-02-28T10:11:00Z" },
+  { id: "13", full_name: "Tomislav Žagar",      role: "fighter", avatar_url: null, created_at: "2026-02-28T10:12:00Z" },
+  { id: "14", full_name: "Damir Herceg",        role: "fighter", avatar_url: null, created_at: "2026-02-28T10:13:00Z" },
+  { id: "15", full_name: "Vedran Banlić",       role: "fighter", avatar_url: null, created_at: "2026-02-28T10:14:00Z" },
+  // Sport Klub Zagreb
+  { id: "16", full_name: "Hrvoje Petranović",   role: "coach",   avatar_url: null, created_at: "2026-02-28T10:15:00Z" },
+  { id: "17", full_name: "Stjepan Matković",    role: "fighter", avatar_url: null, created_at: "2026-02-28T10:16:00Z" },
+  { id: "18", full_name: "Karlo Vukić",         role: "fighter", avatar_url: null, created_at: "2026-02-28T10:17:00Z" },
+  { id: "19", full_name: "Alen Župan",          role: "fighter", avatar_url: null, created_at: "2026-02-28T10:18:00Z" },
+  { id: "20", full_name: "Robert Petrović",     role: "fighter", avatar_url: null, created_at: "2026-02-28T10:19:00Z" },
 ];
 
 export const CLUBS: Club[] = [
-  { id: "club-1", name: "Antigravity MMA", city: "Zagreb", logo_url: "/clubs/antigravity-mma.png", coach_id: null, created_at: "2026-02-28T10:00:00Z" },
-  { id: "club-2", name: "Crows",           city: "Zagreb", logo_url: "/clubs/crows.png",            coach_id: "2",  created_at: "2026-02-28T10:10:00Z" },
+  { id: "club-1", name: "Antigravity MMA",  city: "Zagreb", logo_url: "/clubs/antigravity-mma.png", coach_id: null, created_at: "2026-02-28T10:00:00Z" },
+  { 
+    id: "club-2", 
+    name: "Crows",            
+    city: "Zagreb", 
+    logo_url: "/clubs/crows.png",            
+    coach_id: "2",  
+    description: "Osnovan 2004. godine, UFK Crows je pionir MMA discipline u Hrvatskoj. Sudjelovali smo na brojnim natjecanjima osvojivši medalje u svim kategorijama.",
+    history: "Prvi klub Free fight-a, discipline koja se učila na DIF-u trajao je od 1989. do 1993. godine i iz njega je iznikao naš osnivač i bivši branitelj Željko Banić. Nakon ratnih zbivanja Željko i ostala ekipa se vratila u sport na početku 2000-ih godina, sada pod drugim nazivom – Ultimate fight. Nedugo nakon toga 2004. godine osnovan je Ultimate fight klub Crows u kojem se podučavala isključivo mixed martial arts (MMA) disciplina. Tijekom sljedećih deset godina naš klub sudjelovao je na brojnim nacionalnim natjecanjima osvojivši medalje u svim kategorijama u, već tada formiranom MMA sportu.\n\nŽeljko Banić je sa svojim suradnicima sudjelovao u osnivanju Hrvatskog MMA saveza 2006. godine koji svake godine organizira nacionalna prvenstva i šalje najbolje natjecatenje na Svjetsko međunarodno prvenstvo u amaterskom MMA pod organizacijom Global martial arts association (GAMMA).\n\nŽeljko je 2010. godine završio usavršavanje za Sambo trenera te se prvi put u Republici Hrvatskoj počela podučavati disciplina Sambo i Combat sambo. Među prvim natjecateljima i osvajačima medalje iz našeg kluba bili su Dejan Gunjavić, Marko i Matija Radielović. Dejan i Matija su osvojili brončane medalje na Europskim i svjetskim prvenstvima dok je Marko osvojio srebro. Sambo je postao olimpijski sport 2021. godine čime su službeno počele sportske pripreme za naše sadašnje natjecatelje.",
+    mission: "U Crows klubu, naša misija je inspirirati i osnažiti pojedince svih dobnih skupina da prihvate transformacijsku snagu sporta. Posvećeni smo stvaranju gostoljubivog i inkluzivnog okruženja gdje svatko ima priliku razviti svoj sportski potencijal i postići svoje osobne ciljeve. Naša misija se proteže dalje od samo treniranja sportaša; posvećeni smo razvijanju ljubavi prema sportu za cijeli život te promicanju fizičkog, mentalnog i emocionalnog blagostanja u našoj zajednici.",
+    created_at: "2026-02-28T10:10:00Z" 
+  },
+  { id: "club-3", name: "MMA Klub Ban",     city: "Split",  logo_url: null,                          coach_id: "11", created_at: "2026-02-28T10:20:00Z" },
+  { id: "club-4", name: "Sport Klub Zagreb",city: "Zagreb", logo_url: null,                          coach_id: "16", created_at: "2026-02-28T10:30:00Z" },
 ];
 
 export const FIGHTERS: Fighter[] = [
-  { id: "3",  club_id: "club-2", weight_class: "Middleweight", wins: 8,  losses: 2, draws: 0, date_of_birth: "1998-04-15", nationality: "Croatia", bio: "Dinamičan striker s odličnim clinch radom. Trenira u Antigravity MMA od 2021. godine." },
-  { id: "4",  club_id: "club-2", weight_class: "Lightweight",  wins: 12, losses: 1, draws: 1, date_of_birth: "1996-09-22", nationality: "Croatia", bio: "Veteran domaće scene, bivši prvak regije u Lightweightu. Specijalist za takedowne i ground and pound." },
-  { id: "5",  club_id: "club-2", weight_class: "Welterweight", wins: 5,  losses: 3, draws: 0, date_of_birth: "2001-02-08", nationality: "Croatia", bio: "Mladi Welterweight s velikim potencijalom. Dolazi iz BJJ background-a, radi na striking igri." },
-  { id: "6",  club_id: "club-2", weight_class: "Bantamweight", wins: 7,  losses: 0, draws: 0, date_of_birth: "2000-11-30", nationality: "Croatia", bio: "Neporaženi Bantamweight i ponos kluba. Brz, eksplozivan i precizan — završava borbe rano." },
-  { id: "7",  club_id: "club-2", weight_class: "Heavyweight",  wins: 3,  losses: 4, draws: 1, date_of_birth: "1994-07-19", nationality: "Croatia", bio: "Iskusan Heavyweight koji uči i raste iz svake borbe. Jači grappler, radi na kondicioniranju." },
-  { id: "8",  club_id: "club-1", weight_class: "Featherweight", wins: 6, losses: 2, draws: 0, date_of_birth: "1999-03-12", nationality: "Croatia", bio: "Brz i tehnički Featherweight iz Crows kluba. Odličan u stand-up borbi, radi na ground igri." },
-  { id: "9",  club_id: "club-1", weight_class: "Lightweight",   wins: 4, losses: 3, draws: 1, date_of_birth: "2000-08-25", nationality: "Croatia", bio: "Borbeni Lightweight koji nikad ne odustaje. Odlična izdržljivost i čvrsta brada." },
-  { id: "10", club_id: "club-1", weight_class: "Welterweight",  wins: 9, losses: 1, draws: 0, date_of_birth: "1997-05-18", nationality: "Croatia", bio: "Dominantni Welterweight i ponos Crows kluba. Specijalist za grappling i rear-naked choke." },
+  { id: "3",  club_id: "club-2", weight_class: "Middleweight",    wins: 8,  losses: 2, draws: 0, date_of_birth: "1998-04-15", nationality: "Croatia", bio: "Dinamičan striker s odličnim clinch radom. Trenira od 2021. godine." },
+  { id: "4",  club_id: "club-2", weight_class: "Lightweight",     wins: 12, losses: 1, draws: 1, date_of_birth: "1996-09-22", nationality: "Croatia", bio: "Veteran domaće scene, bivši prvak regije u Lightweightu. Specijalist za takedowne i ground and pound." },
+  { id: "5",  club_id: "club-2", weight_class: "Welterweight",    wins: 5,  losses: 3, draws: 0, date_of_birth: "2001-02-08", nationality: "Croatia", bio: "Mladi Welterweight s velikim potencijalom. Dolazi iz BJJ background-a." },
+  { id: "6",  club_id: "club-2", weight_class: "Bantamweight",    wins: 7,  losses: 0, draws: 0, date_of_birth: "2000-11-30", nationality: "Croatia", bio: "Neporaženi Bantamweight i ponos kluba. Brz, eksplozivan i precizan." },
+  { id: "7",  club_id: "club-2", weight_class: "Heavyweight",     wins: 3,  losses: 4, draws: 1, date_of_birth: "1994-07-19", nationality: "Croatia", bio: "Iskusan Heavyweight koji uči i raste iz svake borbe." },
+  { id: "8",  club_id: "club-1", weight_class: "Featherweight",   wins: 6,  losses: 2, draws: 0, date_of_birth: "1999-03-12", nationality: "Croatia", bio: "Brz i tehnički Featherweight. Odličan u stand-up borbi, radi na ground igri." },
+  { id: "9",  club_id: "club-1", weight_class: "Lightweight",     wins: 4,  losses: 3, draws: 1, date_of_birth: "2000-08-25", nationality: "Croatia", bio: "Borbeni Lightweight koji nikad ne odustaje. Odlična izdržljivost i čvrsta brada." },
+  { id: "10", club_id: "club-1", weight_class: "Welterweight",    wins: 9,  losses: 1, draws: 0, date_of_birth: "1997-05-18", nationality: "Croatia", bio: "Dominantni Welterweight. Specijalist za grappling i rear-naked choke." },
+  // MMA Klub Ban fighters
+  { id: "12", club_id: "club-3", weight_class: "Lightweight",     wins: 6,  losses: 2, draws: 1, date_of_birth: "1999-06-14", nationality: "Croatia", bio: "Eksplozivan Lightweight iz Splita. Odlična osnovica boksača, radi na ground igri." },
+  { id: "13", club_id: "club-3", weight_class: "Middleweight",    wins: 4,  losses: 1, draws: 0, date_of_birth: "2000-03-21", nationality: "Croatia", bio: "Perspektivan model striker s odličnom footwork tehnikom. Brze ruke, brze noge." },
+  { id: "14", club_id: "club-3", weight_class: "Welterweight",    wins: 9,  losses: 3, draws: 0, date_of_birth: "1996-11-05", nationality: "Croatia", bio: "Iskusan veteran kluba Ban. Clinch specijalist koji je dominirao regionalnoj sceni." },
+  { id: "15", club_id: "club-3", weight_class: "Featherweight",   wins: 2,  losses: 0, draws: 0, date_of_birth: "2003-07-17", nationality: "Croatia", bio: "Mladi talent iz Splita. Neporažen u prvim profesionalnim nastupima, veliki potencijal." },
+  // Sport Klub Zagreb fighters
+  { id: "17", club_id: "club-4", weight_class: "Bantamweight",    wins: 5,  losses: 2, draws: 1, date_of_birth: "2001-01-30", nationality: "Croatia", bio: "Tehnički Bantamweight s odličnom BJJ podlogom. Tihi natjecatelj koji govori kroz performanse." },
+  { id: "18", club_id: "club-4", weight_class: "Heavyweight",     wins: 7,  losses: 1, draws: 0, date_of_birth: "1995-09-08", nationality: "Croatia", bio: "Dominantni Heavyweight Sport Kluba. Snažan grappler s knockout udarcem." },
+  { id: "19", club_id: "club-4", weight_class: "Welterweight",    wins: 3,  losses: 3, draws: 2, date_of_birth: "1999-04-22", nationality: "Croatia", bio: "Borbeni Welterweight koji uvijek ide na pobjedu. Nikad ne odustaje, voljan riskirati." },
+  { id: "20", club_id: "club-4", weight_class: "Light Heavyweight",wins: 8,  losses: 0, draws: 1, date_of_birth: "1997-12-03", nationality: "Croatia", bio: "Ponos Sport Kluba Zagreb. Neporažen u Light Heavyweightu, sprema se za veliki korak." },
 ];
 
 export const TOURNAMENTS: Tournament[] = [
   { id: "t-1", name: "Otvoreno Prvenstvo Hrvatske u MMA", date: "2026-04-15", location: "Osijek, Hrvatska",  weight_class: "Lightweight",  status: "upcoming",  created_by: "1", created_at: "2026-03-01T08:00:00Z" },
   { id: "t-2", name: "Zagreb Fight Night #3",             date: "2025-11-22", location: "Zagreb, Hrvatska",  weight_class: "Middleweight", status: "completed", created_by: "1", created_at: "2025-10-01T08:00:00Z" },
+  { id: "t-3", name: "Adria MMA Championship",           date: "2026-05-10", location: "Pula, Hrvatska",    weight_class: "Welterweight", status: "upcoming",  created_by: "1", created_at: "2026-03-10T10:00:00Z" },
+  { id: "t-4", name: "Gladiator Fight Night #8",          date: "2026-06-25", location: "Dubrovnik, Hrvatska", weight_class: "Heavyweight",   status: "upcoming",  created_by: "1", created_at: "2026-03-11T12:00:00Z" },
+  { id: "t-5", name: "FNC 14",                            date: "2025-12-15", location: "Sarajevo, BiH",       weight_class: "Featherweight", status: "completed", created_by: "1", created_at: "2025-11-20T09:00:00Z" },
+  { id: "t-6", name: "Trofej Slobodne Dalmacije",        date: "2026-01-20", location: "Split, Hrvatska",    weight_class: "Bantamweight", status: "completed", created_by: "1", created_at: "2025-12-15T15:00:00Z" },
 ];
 
 export const REGISTRATIONS: TournamentRegistration[] = [
@@ -194,6 +235,27 @@ export const ANNOUNCEMENTS: Announcement[] = [
     author_id: "1", club_id: null, status: "approved", approved_by: "1",
     approved_at: "2026-02-28T12:00:00Z", created_at: "2026-02-28T11:00:00Z",
   },
+  {
+    id: "a-4",
+    title: "Novi sparing termini srijedom",
+    body: "Zbog velikog interesa, uvodimo dodatni termin za sparing srijedom od 20:00 do 21:30. Fokus će biti na MMA simulacijama i kontroli u kavezu. Svi borci su dobrodošli!",
+    author_id: "2", club_id: "club-2", status: "approved", approved_by: "1",
+    approved_at: "2026-03-10T09:00:00Z", created_at: "2026-03-10T08:30:00Z",
+  },
+  {
+    id: "a-5",
+    title: "Pripreme za Adria MMA Championship",
+    body: "Krećemo s intenzivnim pripremama za turnir u Puli. Sljedeća dva tjedna radimo dvostruke treninge (ujutro kondicija, navečer tehnika). Molimo sve natjecatelje da se jave treneru.",
+    author_id: "11", club_id: "club-3", status: "approved", approved_by: "1",
+    approved_at: "2026-03-11T10:00:00Z", created_at: "2026-03-11T09:15:00Z",
+  },
+  {
+    id: "a-6",
+    title: "Seminar s Hrvojem Petranovićem",
+    body: "Ove subote Sport Klub Zagreb ugošćuje poseban seminar o klinču i laktovima u MMA-u. Cijena za članove Saveza je 20 eura. Prijave u inbox!",
+    author_id: "16", club_id: "club-4", status: "approved", approved_by: "1",
+    approved_at: "2026-03-11T14:30:00Z", created_at: "2026-03-11T14:00:00Z",
+  },
 ];
 
 export const TRAINING_SESSIONS: TrainingSession[] = [
@@ -203,13 +265,23 @@ export const TRAINING_SESSIONS: TrainingSession[] = [
   { id: "ts-4", club_id: "club-1", title: "Strength & Conditioning", session_type: "conditioning", day_of_week: 4, start_time: "07:00", end_time: "08:30", location: "Weight Room", notes: null, is_active: true },
   { id: "ts-5", club_id: "club-1", title: "Open Mat",                session_type: "open_mat",     day_of_week: 5, start_time: "10:00", end_time: "12:00", location: "Mat Room",    notes: null, is_active: true },
   { id: "ts-6", club_id: "club-1", title: "Wrestling & Takedowns",   session_type: "grappling",    day_of_week: 6, start_time: "10:00", end_time: "11:30", location: "Main Gym",    notes: null, is_active: true },
-  // Crows (club-2) — same weekly schedule
-  { id: "ts-7", club_id: "club-2", title: "Muay Thai Striking",      session_type: "striking",     day_of_week: 1, start_time: "18:00", end_time: "19:30", location: "Main Gym",    notes: null, is_active: true },
-  { id: "ts-8", club_id: "club-2", title: "BJJ & Grappling",         session_type: "grappling",    day_of_week: 2, start_time: "19:00", end_time: "20:30", location: "Mat Room",    notes: null, is_active: true },
-  { id: "ts-9", club_id: "club-2", title: "MMA Sparring",            session_type: "sparring",     day_of_week: 3, start_time: "18:30", end_time: "20:00", location: "Main Gym",    notes: null, is_active: true },
+  // Crows (club-2)
+  { id: "ts-7",  club_id: "club-2", title: "Muay Thai Striking",      session_type: "striking",     day_of_week: 1, start_time: "18:00", end_time: "19:30", location: "Main Gym",    notes: null, is_active: true },
+  { id: "ts-8",  club_id: "club-2", title: "BJJ & Grappling",         session_type: "grappling",    day_of_week: 2, start_time: "19:00", end_time: "20:30", location: "Mat Room",    notes: null, is_active: true },
+  { id: "ts-9",  club_id: "club-2", title: "MMA Sparring",            session_type: "sparring",     day_of_week: 3, start_time: "18:30", end_time: "20:00", location: "Main Gym",    notes: null, is_active: true },
   { id: "ts-10", club_id: "club-2", title: "Strength & Conditioning", session_type: "conditioning", day_of_week: 4, start_time: "07:00", end_time: "08:30", location: "Weight Room", notes: null, is_active: true },
   { id: "ts-11", club_id: "club-2", title: "Open Mat",                session_type: "open_mat",     day_of_week: 5, start_time: "10:00", end_time: "12:00", location: "Mat Room",    notes: null, is_active: true },
   { id: "ts-12", club_id: "club-2", title: "Wrestling & Takedowns",   session_type: "grappling",    day_of_week: 6, start_time: "10:00", end_time: "11:30", location: "Main Gym",    notes: null, is_active: true },
+  // MMA Klub Ban (club-3)
+  { id: "ts-13", club_id: "club-3", title: "Kickboxing & Striking",   session_type: "striking",     day_of_week: 1, start_time: "17:30", end_time: "19:00", location: "Ban Gym Split", notes: null, is_active: true },
+  { id: "ts-14", club_id: "club-3", title: "No-Gi Grappling",         session_type: "grappling",    day_of_week: 3, start_time: "18:00", end_time: "19:30", location: "Ban Gym Split", notes: null, is_active: true },
+  { id: "ts-15", club_id: "club-3", title: "MMA Sparring",            session_type: "sparring",     day_of_week: 5, start_time: "17:00", end_time: "18:30", location: "Ban Gym Split", notes: null, is_active: true },
+  { id: "ts-16", club_id: "club-3", title: "Open Mat Sunday",         session_type: "open_mat",     day_of_week: 0, start_time: "10:00", end_time: "12:00", location: "Ban Gym Split", notes: null, is_active: true },
+  // Sport Klub Zagreb (club-4)
+  { id: "ts-17", club_id: "club-4", title: "Boxing Fundamentals",     session_type: "striking",     day_of_week: 2, start_time: "19:00", end_time: "20:30", location: "SKZ Dvorana",   notes: null, is_active: true },
+  { id: "ts-18", club_id: "club-4", title: "Wrestling & Clinch",      session_type: "grappling",    day_of_week: 4, start_time: "18:00", end_time: "19:30", location: "SKZ Dvorana",   notes: null, is_active: true },
+  { id: "ts-19", club_id: "club-4", title: "Full MMA Sparring",       session_type: "sparring",     day_of_week: 6, start_time: "10:00", end_time: "11:30", location: "SKZ Dvorana",   notes: null, is_active: true },
+  { id: "ts-20", club_id: "club-4", title: "Cardio & Conditioning",   session_type: "conditioning", day_of_week: 1, start_time: "06:30", end_time: "08:00", location: "SKZ Dvorana",   notes: null, is_active: true },
 ];
 
 export function getRegistration(

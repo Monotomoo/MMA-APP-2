@@ -7,13 +7,13 @@ import { useTournaments } from "@/hooks/useTournaments";
 import { useAuth } from "@/hooks/useAuth";
 import { getRegistration } from "@/lib/demo-data";
 import { Tournament, RegistrationStatus } from "@/lib/demo-data";
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar, MapPin, Plus } from "lucide-react";
 
 const WEIGHT_CLASSES = [
@@ -31,9 +31,9 @@ const newTournamentSchema = z.object({
 type NewTournamentForm = z.infer<typeof newTournamentSchema>;
 
 const STATUS_COLORS: Record<string, string> = {
-  upcoming:  "bg-blue-500/10 text-blue-600 border-blue-500/30",
-  active:    "bg-green-500/10 text-green-600 border-green-500/30",
-  completed: "bg-gray-500/10 text-gray-500 border-gray-500/30",
+  upcoming:  "bg-blue-500/15 text-blue-400 border-blue-500/30",
+  active:    "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
+  completed: "bg-gray-500/10 text-gray-500 border-gray-500/20",
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -43,9 +43,9 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const REG_COLORS: Record<string, string> = {
-  approved: "bg-green-500/10 text-green-600 border-green-500/30",
-  pending:  "bg-yellow-500/10 text-yellow-600 border-yellow-500/30",
-  rejected: "bg-red-500/10 text-red-600 border-red-500/30",
+  approved: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
+  pending:  "bg-amber-500/15 text-amber-400 border-amber-500/30",
+  rejected: "bg-red-500/15 text-red-400 border-red-500/20",
 };
 
 const REG_LABELS: Record<string, string> = {
@@ -68,40 +68,41 @@ function TournamentCard({
   t: Tournament;
   myRegStatus: RegistrationStatus | null;
 }) {
+  const isActive = t.status === "active";
   return (
     <Link to={`/app/tournaments/${t.id}`}>
-      <Card className="hover:border-primary/50 transition-colors cursor-pointer">
-        <CardHeader>
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <CardTitle className="text-base">{t.name}</CardTitle>
-              <CardDescription className="flex flex-wrap gap-3 mt-1">
-                {t.date && (
-                  <span className="flex items-center gap-1">
-                    <Calendar className="h-3 w-3" />{fmt(t.date)}
-                  </span>
-                )}
-                {t.location && (
-                  <span className="flex items-center gap-1">
-                    <MapPin className="h-3 w-3" />{t.location}
-                  </span>
-                )}
-              </CardDescription>
-            </div>
-            <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
-              {t.weight_class && <Badge variant="outline">{t.weight_class}</Badge>}
-              <Badge className={STATUS_COLORS[t.status]} variant="outline">
-                {STATUS_LABELS[t.status] ?? t.status}
-              </Badge>
-              {myRegStatus && (
-                <Badge className={REG_COLORS[myRegStatus]} variant="outline">
-                  {REG_LABELS[myRegStatus] ?? myRegStatus}
-                </Badge>
+      <div className={`card-hover-glow border rounded-xl p-4 bg-card transition-all duration-200 cursor-pointer ${isActive ? "border-emerald-500/30 animate-border-pulse" : "border-border/60"}`}>
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1 min-w-0">
+            <p className="font-display text-xl font-bold tracking-wide truncate">{t.name}</p>
+            <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1.5 text-xs text-muted-foreground">
+              {t.date && (
+                <span className="flex items-center gap-1">
+                  <Calendar className="h-3 w-3" />{fmt(t.date)}
+                </span>
+              )}
+              {t.location && (
+                <span className="flex items-center gap-1">
+                  <MapPin className="h-3 w-3" />{t.location}
+                </span>
               )}
             </div>
           </div>
-        </CardHeader>
-      </Card>
+          <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+            {t.weight_class && (
+              <Badge variant="outline" className="border-border/60 text-xs">{t.weight_class}</Badge>
+            )}
+            <Badge className={`${STATUS_COLORS[t.status]} text-xs`} variant="outline">
+              {STATUS_LABELS[t.status] ?? t.status}
+            </Badge>
+            {myRegStatus && (
+              <Badge className={`${REG_COLORS[myRegStatus]} text-xs`} variant="outline">
+                {REG_LABELS[myRegStatus] ?? myRegStatus}
+              </Badge>
+            )}
+          </div>
+        </div>
+      </div>
     </Link>
   );
 }
@@ -137,13 +138,17 @@ export default function TournamentsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex items-center justify-between gap-4 animate-fade-up">
         <div>
-          <h1 className="text-2xl font-bold">Turniri</h1>
-          <p className="text-muted-foreground">Događaji i natjecanja</p>
+          <h1 className="text-3xl font-display font-bold tracking-widest">Turniri</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">Događaji i natjecanja</p>
         </div>
         {isAdmin && (
-          <Button size="sm" onClick={() => { form.reset(); setCreateOpen(true); }}>
+          <Button
+            size="sm"
+            onClick={() => { form.reset(); setCreateOpen(true); }}
+            className="bg-primary hover:bg-primary/90 shadow-glow-primary cursor-pointer transition-all duration-200"
+          >
             <Plus className="h-4 w-4 mr-1" /> Novi turnir
           </Button>
         )}
@@ -151,19 +156,19 @@ export default function TournamentsPage() {
 
       {active.length > 0 && (
         <section className="space-y-3">
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Aktivni</h2>
+          <h2 className="text-xs font-display font-bold text-emerald-400 uppercase tracking-widest">Aktivni</h2>
           {active.map((t) => <TournamentCard key={t.id} t={t} myRegStatus={myReg(t.id)} />)}
         </section>
       )}
       {upcoming.length > 0 && (
         <section className="space-y-3">
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Nadolazeći</h2>
+          <h2 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-widest">Nadolazeći</h2>
           {upcoming.map((t) => <TournamentCard key={t.id} t={t} myRegStatus={myReg(t.id)} />)}
         </section>
       )}
       {completed.length > 0 && (
         <section className="space-y-3">
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Završeni</h2>
+          <h2 className="text-xs font-display font-bold text-muted-foreground/60 uppercase tracking-widest">Završeni</h2>
           {completed.map((t) => <TournamentCard key={t.id} t={t} myRegStatus={null} />)}
         </section>
       )}

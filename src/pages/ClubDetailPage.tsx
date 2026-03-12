@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { ArrowLeft, Users, Clock, MapPin, Plus, Building2 } from "lucide-react";
+import { ArrowLeft, Users, Clock, MapPin, Plus, Building2, Info, Target } from "lucide-react";
 import { toast } from "sonner";
 
 const WEEK_DAYS = [
@@ -129,6 +129,39 @@ export default function ClubDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Mission Section (if available) */}
+      {club.mission && (
+        <Card className="border-border/60 bg-card border-l-[3px] border-l-accent-glow">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-lg font-display uppercase tracking-wider text-foreground/90">
+              <Target className="h-5 w-5 text-accent" />
+              O nama
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm italic leading-relaxed text-foreground/80 font-medium tracking-tight">
+              "{club.mission}"
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* History Section (if available) */}
+      {club.history && (
+        <Card className="border-border/60 bg-card border-l-[3px] border-l-primary/40">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg font-display uppercase tracking-wider text-foreground/90">
+              Povijest kluba
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm leading-relaxed text-foreground/90 whitespace-pre-wrap font-medium tracking-tight">
+              {club.history}
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Roster */}
       <Card>

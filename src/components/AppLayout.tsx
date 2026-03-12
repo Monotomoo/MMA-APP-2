@@ -14,18 +14,20 @@ const AppLayout = () => {
       <div className="min-h-screen flex w-full">
         <AppSidebar />
         <div className="flex-1 flex flex-col">
-          <header className="h-14 flex items-center justify-between border-b px-4 gap-3">
+          <header className="h-14 flex items-center justify-between border-b border-border/60 bg-background px-4 gap-3 sticky top-0 z-30">
             <div className="flex items-center gap-3">
               <SidebarTrigger />
-              <span className="font-display text-lg font-bold tracking-wider">Hrvatski MMA Savez</span>
+              <span className="font-display text-base font-bold tracking-widest uppercase text-gradient-primary hidden sm:block">
+                Hrvatski MMA Savez
+              </span>
             </div>
             <div className="flex items-center gap-3">
               {profile && (
-                <span className="text-sm text-muted-foreground hidden sm:inline">
+                <span className="text-xs text-muted-foreground hidden sm:inline bg-secondary px-3 py-1 rounded-full border border-border/60">
                   {profile.full_name}
                 </span>
               )}
-              <Button variant="ghost" size="sm" onClick={signOut} className="gap-2">
+              <Button variant="ghost" size="sm" onClick={signOut} className="gap-2 hover:text-primary hover:bg-primary/10 cursor-pointer transition-colors duration-150">
                 <LogOut className="h-4 w-4" />
                 <span className="hidden sm:inline">Odjava</span>
               </Button>

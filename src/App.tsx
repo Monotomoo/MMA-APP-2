@@ -14,6 +14,8 @@ import AdminPage from "./pages/AdminPage";
 import ClubsPage from "./pages/ClubsPage";
 import ClubDetailPage from "./pages/ClubDetailPage";
 import CalendarPage from "./pages/CalendarPage";
+import NewsPage from "./pages/NewsPage";
+import MMASavezPage from "./pages/MMASavezPage";
 import NotFound from "./pages/NotFound";
 import { useAuth } from "./hooks/useAuth";
 
@@ -52,6 +54,8 @@ const App = () => (
             <Route path="clubs" element={<ClubsPage />} />
             <Route path="clubs/:id" element={<ClubDetailPage />} />
             <Route path="calendar" element={<CalendarPage />} />
+            <Route path="news" element={<NewsPage />} />
+            <Route path="savez" element={<MMASavezPage />} />
             <Route path="admin" element={<AdminPage />} />
           </Route>
           <Route path="/" element={<Navigate to="/login" replace />} />
