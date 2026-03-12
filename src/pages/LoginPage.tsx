@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { Flame, Shield } from "lucide-react";
+import { Shield } from "lucide-react";
 
 const LoginPage = () => {
   const [email, setEmail]       = useState("");
@@ -39,31 +39,43 @@ const LoginPage = () => {
   return (
     <div className="login-bg relative flex min-h-screen items-center justify-center p-4 overflow-hidden">
 
+      <div aria-hidden="true" className="login-overlay" />
       <div aria-hidden="true" className="login-glow-line pointer-events-none" />
+      <div aria-hidden="true" className="login-top-accent" />
 
       {/* ── Card ──────────────────────────────────────────────────────────── */}
-      <div className="relative z-10 w-full max-w-sm">
-        {/* Logo */}
-        <div className="mb-8 flex flex-col items-center gap-3">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary shadow-glow-primary-strong animate-pulse-glow">
-            <Flame className="h-8 w-8 text-primary-foreground" />
-          </div>
-          <div className="text-center">
-            <h1 className="shimmer-text font-display text-5xl font-black tracking-widest uppercase">
-              Antigravity
+      <div className="relative z-10 w-full max-w-md">
+
+        {/* Logo + Title */}
+        <div className="mb-10 flex flex-col items-center gap-5">
+          <img
+            src="/assets/hrvatski_mma_savez_logo.png"
+            alt="Hrvatski MMA Savez"
+            className="h-28 w-28 object-contain drop-shadow-[0_0_32px_rgba(200,0,0,0.6)]"
+          />
+          <div className="text-center space-y-1">
+            <h1 className="login-title font-display font-black uppercase">
+              Hrvatski MMA Savez
             </h1>
-            <p className="text-xs text-muted-foreground tracking-widest uppercase mt-1">
-              MMA Savez &mdash; Prijava
-            </p>
+            <div className="flex items-center justify-center gap-3 mt-1">
+              <span className="h-px w-12 bg-primary/60" />
+              <p className="text-sm font-display font-semibold tracking-[0.3em] uppercase text-primary">
+                Pristup sustavu
+              </p>
+              <span className="h-px w-12 bg-primary/60" />
+            </div>
           </div>
         </div>
 
         {/* Form card */}
-        <div className="rounded-2xl border border-border/60 bg-card p-6 shadow-glow-primary space-y-5">
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="email" className="text-xs uppercase tracking-widest text-muted-foreground">
-                E-mail / korisničko ime
+        <div className="login-card rounded-xl border border-white/10 p-8 space-y-6">
+          {/* Red top border accent */}
+          <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-primary to-transparent rounded-full" />
+
+          <form onSubmit={handleLogin} className="space-y-5">
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground font-semibold">
+                E-mail / Korisničko ime
               </Label>
               <Input
                 id="email"
@@ -72,11 +84,11 @@ const LoginPage = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="border-border/60 bg-secondary/50 focus:border-primary focus:ring-primary/20 transition-colors duration-150"
+                className="h-12 text-base border-white/10 bg-white/5 focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all duration-150 placeholder:text-muted-foreground/40"
               />
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="password" className="text-xs uppercase tracking-widest text-muted-foreground">
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground font-semibold">
                 Lozinka
               </Label>
               <Input
@@ -86,7 +98,7 @@ const LoginPage = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="border-border/60 bg-secondary/50 focus:border-primary focus:ring-primary/20 transition-colors duration-150"
+                className="h-12 text-base border-white/10 bg-white/5 focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all duration-150"
               />
             </div>
 
@@ -97,20 +109,20 @@ const LoginPage = () => {
             )}
 
             <Button
-              className="w-full bg-primary hover:bg-primary/90 shadow-glow-primary hover:shadow-glow-primary-strong transition-all duration-200 cursor-pointer font-display tracking-widest text-base uppercase"
+              className="login-btn w-full h-13 text-base font-display font-black tracking-[0.2em] uppercase cursor-pointer transition-all duration-200"
               size="lg"
               type="submit"
               disabled={loading}
             >
-              {loading ? "Prijava..." : "Prijavi se"}
+              {loading ? "Prijava u tijeku..." : "Prijavi se"}
             </Button>
           </form>
 
           {/* Dev hint */}
-          <div className="flex items-center gap-2 rounded-lg bg-secondary/50 border border-border/40 px-3 py-2">
-            <Shield className="h-3.5 w-3.5 shrink-0 text-muted-foreground/60" />
-            <p className="text-[11px] text-muted-foreground/60">
-              Dev pristup: <span className="font-mono text-muted-foreground">tomo / tomo</span>
+          <div className="flex items-center gap-2 rounded-lg bg-white/5 border border-white/8 px-3 py-2">
+            <Shield className="h-3.5 w-3.5 shrink-0 text-muted-foreground/50" />
+            <p className="text-[11px] text-muted-foreground/50">
+              Demo pristup: <span className="font-mono text-muted-foreground/70">tomo / tomo</span>
             </p>
           </div>
         </div>
