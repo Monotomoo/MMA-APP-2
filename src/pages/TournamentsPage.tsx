@@ -5,8 +5,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTournaments } from "@/hooks/useTournaments";
 import { useAuth } from "@/hooks/useAuth";
-import { getRegistration, TournamentCategory, AGE_GROUPS, WEIGHT_CLASS_DATA } from "@/lib/demo-data";
-import { Tournament, RegistrationStatus } from "@/lib/demo-data";
+import { getRegistration, TournamentCategory, AGE_GROUPS, WEIGHT_CLASS_DATA, TIER_DATA } from "@/lib/demo-data";
+import { Tournament, RegistrationStatus, TournamentTier } from "@/lib/demo-data";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,8 +30,15 @@ const newTournamentSchema = z.object({
   max_fighters:          z.coerce.number().int().min(1).optional().or(z.literal("")),
   rules:                 z.string().optional(),
   gender:                z.enum(["male", "female", "open"]).optional(),
+  tier:                  z.string().optional(),
 });
 type NewTournamentForm = z.infer<typeof newTournamentSchema>;
+
+function tierBadgeClass(tier: string) {
+  if (tier === "prva_borba") return "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+  if (tier === "b_turnir")   return "bg-blue-500/20 text-blue-400 border border-blue-500/30";
+  return "bg-accent/20 text-accent border border-accent/30";
+}
 
 const STATUS_COLORS: Record<string, string> = {
   upcoming:  "bg-blue-500/15 text-blue-400 border-blue-500/30",
@@ -97,6 +104,11 @@ function TournamentCard({
                 {t.categories.length} {t.categories.length === 1 ? "kategorija" : "kategorije"}
               </Badge>
             )}
+            {t.tier && (
+              <Badge className={`${tierBadgeClass(t.tier)} text-xs`} variant="outline">
+                {TIER_DATA.find((d) => d.id === t.tier)?.label}
+              </Badge>
+            )}
             <Badge className={`${STATUS_COLORS[t.status]} text-xs`} variant="outline">
               {STATUS_LABELS[t.status] ?? t.status}
             </Badge>
@@ -152,6 +164,7 @@ export default function TournamentsPage() {
       max_fighters:          data.max_fighters ? Number(data.max_fighters) : null,
       rules:                 data.rules || null,
       gender:                data.gender ?? null,
+      tier:                  (data.tier as TournamentTier) ?? null,
     });
     setCreateOpen(false);
     setNewCategories([]);
@@ -316,6 +329,21 @@ export default function TournamentsPage() {
                     </FormItem>
                   )} />
                 </div>
+
+                <FormField control={form.control} name="tier" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Razina turnira</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value || undefined}>
+                      <FormControl><SelectTrigger><SelectValue placeholder="Odaberi razinu" /></SelectTrigger></FormControl>
+                      <SelectContent>
+                        {TIER_DATA.map((t) => (
+                          <SelectItem key={t.id} value={t.id}>{t.label} — {t.description}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )} />
 
                 <div className="grid grid-cols-2 gap-4">
                   <FormField control={form.control} name="rules" render={({ field }) => (

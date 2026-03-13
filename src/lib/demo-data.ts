@@ -10,6 +10,13 @@ export type RegistrationStatus = "pending" | "approved" | "rejected";
 export type BoutStatus         = "scheduled" | "completed";
 export type SessionType        = "striking" | "grappling" | "sparring" | "conditioning" | "open_mat" | "other";
 export type AgeGroup           = "kadeti" | "juniori" | "seniori" | "veterani";
+export type TournamentTier     = "prva_borba" | "b_turnir" | "a_turnir";
+
+export const TIER_DATA: { id: TournamentTier; label: string; description: string }[] = [
+  { id: "prva_borba", label: "Prva Borba", description: "Za početnike — prva borba" },
+  { id: "b_turnir",   label: "B Turnir",   description: "1–3 amaterske borbe" },
+  { id: "a_turnir",   label: "A Turnir",   description: "Iskusni amateri" },
+];
 
 export const AGE_GROUPS: { id: AgeGroup; label: string; min_age: number; max_age: number | null }[] = [
   { id: "kadeti",   label: "Kadeti",   min_age: 14, max_age: 17 },
@@ -84,6 +91,7 @@ export interface Tournament {
   max_fighters: number | null;
   rules: string | null;
   gender: "male" | "female" | "open" | null;
+  tier: TournamentTier | null;
 }
 
 export interface TournamentRegistration {
@@ -259,7 +267,7 @@ export const TOURNAMENTS: Tournament[] = [
     id: "t-1", name: "Otvoreno Prvenstvo Hrvatske u MMA", date: "2026-04-15", location: "Osijek, Hrvatska",
     status: "upcoming", created_by: "1", created_at: "2026-03-01T08:00:00Z",
     description: "Godišnje otvoreno državno natjecanje u MMA-u. Otvoreno za sve klubove članice Saveza.",
-    registration_deadline: "2026-04-01", max_fighters: 64, rules: "IMMAF Rules", gender: "male",
+    registration_deadline: "2026-04-01", max_fighters: 64, rules: "IMMAF Rules", gender: "male", tier: "a_turnir",
     categories: [
       { age_group: "kadeti",  weight_class: "Bantamweight",      weight_limit_kg: 61.2 },
       { age_group: "kadeti",  weight_class: "Featherweight",     weight_limit_kg: 65.8 },
@@ -277,7 +285,7 @@ export const TOURNAMENTS: Tournament[] = [
     id: "t-2", name: "Zagreb Fight Night #3", date: "2025-11-22", location: "Zagreb, Hrvatska",
     status: "completed", created_by: "1", created_at: "2025-10-01T08:00:00Z",
     description: "Treće izdanje popularnog noćnog spektakla u Zagrebu.",
-    registration_deadline: "2025-11-10", max_fighters: 16, rules: "Local Rules", gender: "open",
+    registration_deadline: "2025-11-10", max_fighters: 16, rules: "Local Rules", gender: "open", tier: "b_turnir",
     categories: [
       { age_group: "seniori", weight_class: "Middleweight", weight_limit_kg: 83.9 },
     ],
@@ -286,7 +294,7 @@ export const TOURNAMENTS: Tournament[] = [
     id: "t-3", name: "Adria MMA Championship", date: "2026-05-10", location: "Pula, Hrvatska",
     status: "upcoming", created_by: "1", created_at: "2026-03-10T10:00:00Z",
     description: "Regionalno natjecanje koje okuplja klubove iz Hrvatske, Slovenije i Bosne.",
-    registration_deadline: "2026-04-25", max_fighters: 48, rules: "IMMAF Rules", gender: "open",
+    registration_deadline: "2026-04-25", max_fighters: 48, rules: "IMMAF Rules", gender: "open", tier: "a_turnir",
     categories: [
       { age_group: "juniori", weight_class: "Bantamweight",  weight_limit_kg: 61.2 },
       { age_group: "juniori", weight_class: "Lightweight",   weight_limit_kg: 70.3 },
@@ -300,7 +308,7 @@ export const TOURNAMENTS: Tournament[] = [
     id: "t-4", name: "Gladiator Fight Night #8", date: "2026-06-25", location: "Dubrovnik, Hrvatska",
     status: "upcoming", created_by: "1", created_at: "2026-03-11T12:00:00Z",
     description: "Ekskluzivni turnir teških kategorija uz spektakularnu lokaciju u Dubrovniku.",
-    registration_deadline: "2026-06-10", max_fighters: 16, rules: "Local Rules", gender: "male",
+    registration_deadline: "2026-06-10", max_fighters: 16, rules: "Local Rules", gender: "male", tier: "b_turnir",
     categories: [
       { age_group: "seniori", weight_class: "Light Heavyweight", weight_limit_kg: 93.0  },
       { age_group: "seniori", weight_class: "Heavyweight",       weight_limit_kg: 120.2 },
@@ -310,7 +318,7 @@ export const TOURNAMENTS: Tournament[] = [
   {
     id: "t-5", name: "FNC 14", date: "2025-12-15", location: "Sarajevo, BiH",
     status: "completed", created_by: "1", created_at: "2025-11-20T09:00:00Z",
-    description: null, registration_deadline: "2025-12-01", max_fighters: 32, rules: "IMMAF Rules", gender: "open",
+    description: null, registration_deadline: "2025-12-01", max_fighters: 32, rules: "IMMAF Rules", gender: "open", tier: "a_turnir",
     categories: [
       { age_group: "seniori", weight_class: "Bantamweight",  weight_limit_kg: 61.2 },
       { age_group: "seniori", weight_class: "Featherweight", weight_limit_kg: 65.8 },
@@ -320,7 +328,7 @@ export const TOURNAMENTS: Tournament[] = [
     id: "t-6", name: "Trofej Slobodne Dalmacije", date: "2026-01-20", location: "Split, Hrvatska",
     status: "completed", created_by: "1", created_at: "2025-12-15T15:00:00Z",
     description: "Tradicionalni trofej koji se već 12 godina održava u Splitu.",
-    registration_deadline: "2026-01-10", max_fighters: 32, rules: "Local Rules", gender: "open",
+    registration_deadline: "2026-01-10", max_fighters: 32, rules: "Local Rules", gender: "open", tier: "prva_borba",
     categories: [
       { age_group: "kadeti",  weight_class: "Bantamweight",  weight_limit_kg: 61.2 },
       { age_group: "kadeti",  weight_class: "Featherweight", weight_limit_kg: 65.8 },

@@ -7,7 +7,7 @@ import { useAnnouncements } from "@/hooks/useAnnouncements";
 import { useAuth } from "@/hooks/useAuth";
 import {
   PROFILES, CLUBS, Tournament, Profile,
-  TournamentCategory, AGE_GROUPS, WEIGHT_CLASS_DATA,
+  TournamentCategory, AGE_GROUPS, WEIGHT_CLASS_DATA, TIER_DATA, TournamentTier,
   createProfile as createProfileData,
   updateProfile as updateProfileData,
   deleteProfile as deleteProfileData,
@@ -55,6 +55,7 @@ const tournamentSchema = z.object({
   max_fighters:          z.coerce.number().int().min(1).optional().or(z.literal("")),
   rules:                 z.string().optional(),
   gender:                z.enum(["male", "female", "open"]).optional(),
+  tier:                  z.string().optional(),
 });
 
 type TournamentForm = z.infer<typeof tournamentSchema>;
@@ -102,11 +103,11 @@ export default function AdminPage() {
 
   const form = useForm<TournamentForm>({
     resolver: zodResolver(tournamentSchema),
-    defaultValues: { name: "", date: "", location: "", status: "upcoming", description: "", registration_deadline: "", max_fighters: "", rules: "", gender: undefined },
+    defaultValues: { name: "", date: "", location: "", status: "upcoming", description: "", registration_deadline: "", max_fighters: "", rules: "", gender: undefined, tier: undefined },
   });
 
   function openCreate() {
-    form.reset({ name: "", date: "", location: "", status: "upcoming", description: "", registration_deadline: "", max_fighters: "", rules: "", gender: undefined });
+    form.reset({ name: "", date: "", location: "", status: "upcoming", description: "", registration_deadline: "", max_fighters: "", rules: "", gender: undefined, tier: undefined });
     setEditCategories([]);
     setEditingTournament("new");
   }
@@ -122,6 +123,7 @@ export default function AdminPage() {
       max_fighters:          t.max_fighters ?? "",
       rules:                 t.rules ?? "",
       gender:                t.gender ?? undefined,
+      tier:                  t.tier ?? undefined,
     });
     setEditCategories(t.categories ?? []);
     setEditingTournament(t);
@@ -149,6 +151,7 @@ export default function AdminPage() {
       max_fighters:          data.max_fighters ? Number(data.max_fighters) : null,
       rules:                 data.rules || null,
       gender:                data.gender ?? null,
+      tier:                  (data.tier as TournamentTier) ?? null,
     };
 
     if (editingTournament === "new") {
@@ -501,6 +504,21 @@ export default function AdminPage() {
                     </FormItem>
                   )} />
                 </div>
+
+                <FormField control={form.control} name="tier" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Razina turnira</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value || undefined}>
+                      <FormControl><SelectTrigger><SelectValue placeholder="Odaberi razinu" /></SelectTrigger></FormControl>
+                      <SelectContent>
+                        {TIER_DATA.map((t) => (
+                          <SelectItem key={t.id} value={t.id}>{t.label} — {t.description}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )} />
 
                 <div className="grid grid-cols-2 gap-4">
                   <FormField control={form.control} name="rules" render={({ field }) => (

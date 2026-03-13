@@ -16,6 +16,7 @@ import ClubDetailPage from "./pages/ClubDetailPage";
 import CalendarPage from "./pages/CalendarPage";
 import NewsPage from "./pages/NewsPage";
 import MMASavezPage from "./pages/MMASavezPage";
+import RankingsPage from "./pages/RankingsPage";
 import NotFound from "./pages/NotFound";
 import { useAuth } from "./hooks/useAuth";
 
@@ -53,6 +54,7 @@ const App = () => (
             <Route path="tournaments/:id" element={<TournamentDetailPage />} />
             <Route path="clubs" element={<ClubsPage />} />
             <Route path="clubs/:id" element={<ClubDetailPage />} />
+            <Route path="rankings" element={<RankingsPage />} />
             <Route path="calendar" element={<CalendarPage />} />
             <Route path="news" element={<NewsPage />} />
             <Route path="savez" element={<MMASavezPage />} />

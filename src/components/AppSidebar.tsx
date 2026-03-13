@@ -1,4 +1,4 @@
-import { LayoutDashboard, Newspaper, Users, Trophy, Settings, Building2, Calendar, ShieldCheck } from "lucide-react";
+import { LayoutDashboard, Newspaper, Users, Trophy, Medal, Settings, Building2, Calendar, ShieldCheck } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -26,6 +26,7 @@ export function AppSidebar() {
     { title: "Moj klub",    url: "/app/my-club",    icon: Users,           show: isCoach },
     { title: "Svi klubovi", url: "/app/clubs",      icon: Building2,       show: true    },
     { title: "Turniri",     url: "/app/tournaments", icon: Trophy,         show: true    },
+    { title: "Rang lista",  url: "/app/rankings",   icon: Medal,           show: true    },
     { title: "Kalendar",    url: "/app/calendar",   icon: Calendar,        show: true    },
     { title: "Admin",       url: "/app/admin",      icon: Settings,        show: isAdmin },
   ].filter((i) => i.show);
