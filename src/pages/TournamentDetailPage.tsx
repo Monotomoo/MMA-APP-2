@@ -14,13 +14,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { ArrowLeft, Calendar, MapPin, Users, Activity, UserPlus, Plus } from "lucide-react";
+import { ArrowLeft, Calendar, MapPin, Users, Activity, UserPlus, Plus, Clock, ShieldCheck, Users2 } from "lucide-react";
 
 function initials(name: string) {
   if (name === "TBD") return "?";
   return name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
 }
-import { CLUBS, FIGHTERS, getFighterName } from "@/lib/demo-data";
+import { CLUBS, FIGHTERS, getFighterName, AGE_GROUPS } from "@/lib/demo-data";
 import { toast } from "sonner";
 
 const STATUS_COLORS: Record<string, string> = {
@@ -57,7 +57,8 @@ function fmt(iso: string | null) {
 }
 
 // ── Bracket tree helpers ──────────────────────────────────────────────────────
-const CARD_H = 80; // px — must match bout card height exactly
+const CARD_H = 100; // px — must match bout card height exactly
+const CONN_W = 24;
 
 type BoutRow = {
   id: string; bout_order: number; status: string;
@@ -78,6 +79,15 @@ function buildRounds(bouts: BoutRow[]): BoutRow[][] {
     rem = rem.slice(sz);
   }
   return rounds;
+}
+
+function getRoundLabel(nRounds: number, ri: number): string {
+  const f = nRounds - 1 - ri;
+  if (f === 0) return "Finale";
+  if (f === 1) return "Polufinale";
+  if (f === 2) return "Četvrtfinale";
+  const sz = Math.pow(2, nRounds - 1 - ri + 1);
+  return `1/${sz} Finala`;
 }
 
 const addMatchSchema = z.object({
@@ -127,7 +137,7 @@ export default function TournamentDetailPage() {
   }
 
   // ── Bout view toggle ─────────────────────────────────────────────────────
-  const [boutView, setBoutView] = useState<"list" | "bracket">("list");
+  const [boutView, setBoutView] = useState<"list" | "bracket">("bracket");
 
   // ── Add Match dialog ──────────────────────────────────────────────────────
   const [addMatchOpen, setAddMatchOpen] = useState(false);
@@ -180,31 +190,34 @@ export default function TournamentDetailPage() {
     const rounds = buildRounds(bouts);
     if (!rounds.length) return <p className="text-sm text-muted-foreground">Nema mečeva.</p>;
     const nRounds = rounds.length;
-    const CARD_W = 172;
-    const roundLabels = rounds.map((_, ri) => {
-      const f = nRounds - 1 - ri;
-      if (f === 0) return "Finale";
-      if (f === 1) return "Polufinale";
-      if (f === 2) return "Četvrtfinale";
-      return `Runda ${ri + 1}`;
-    });
+    const CARD_W = 210;
+    const rowH   = Math.floor(CARD_H * 0.41);
+    const vsH    = CARD_H - rowH * 2;
     return (
-      <div className="overflow-x-auto -mx-1 px-1">
-        <div className="flex gap-0 mb-3">
-          {rounds.map((_, ri) => (
-            <div key={ri} style={{ width: CARD_W + (ri < nRounds - 1 ? 20 : 0), flexShrink: 0 }}>
-              <p className="text-[10px] font-semibold text-muted-foreground text-center uppercase tracking-wide">
-                {roundLabels[ri]}
-              </p>
-            </div>
-          ))}
+      <div className="overflow-x-auto pb-2">
+        {/* Round labels */}
+        <div className="flex mb-4">
+          {rounds.map((_, ri) => {
+            const isFinal = ri === nRounds - 1;
+            const colW = CARD_W + (ri < nRounds - 1 ? CONN_W : 0);
+            return (
+              <div key={ri} className="text-center shrink-0" style={{ width: colW }}>
+                <span className={`text-[10px] font-bold uppercase tracking-widest ${isFinal ? "text-primary" : "text-muted-foreground/70"}`}>
+                  {getRoundLabel(nRounds, ri)}
+                </span>
+                {isFinal && <div className="h-0.5 w-8 bg-primary rounded mx-auto mt-0.5" />}
+              </div>
+            );
+          })}
         </div>
-        <div className="flex items-start gap-0 min-w-max">
+        {/* Bracket columns */}
+        <div className="flex items-start min-w-max">
           {rounds.map((round, ri) => {
             const gapR   = (Math.pow(2, ri) - 1) * CARD_H;
             const topOff = (Math.pow(2, ri) - 1) * CARD_H / 2;
             const connH  = CARD_H + gapR;
             const nConns = Math.floor(round.length / 2);
+            const isFinalRound = ri === nRounds - 1;
             return (
               <Fragment key={ri}>
                 <div className="flex flex-col shrink-0" style={{ width: CARD_W, marginTop: topOff }}>
@@ -213,41 +226,86 @@ export default function TournamentDetailPage() {
                       const aWins = b.winner_id === b.fighter_a_id;
                       const bWins = b.winner_id === b.fighter_b_id;
                       const done  = b.status === "completed";
-                      const rowH  = Math.floor(CARD_H * 0.42);
-                      const vsH   = CARD_H - rowH * 2;
+                      const isTbd = !b.fighter_b_id || b.fighter_a_id.startsWith("tbd-");
                       return (
-                        <div key={b.id} className="rounded border bg-card overflow-hidden shrink-0" style={{ height: CARD_H, width: CARD_W }}>
-                          <div className={`flex items-center gap-1.5 px-2 border-b ${aWins ? "bg-green-500/10" : done && b.winner_id ? "opacity-50" : ""}`} style={{ height: rowH }}>
+                        <div
+                          key={b.id}
+                          className={`overflow-hidden shrink-0 rounded-lg border ${
+                            isFinalRound
+                              ? "border-primary/40 shadow-glow-primary bg-card"
+                              : done
+                                ? "border-border/80 bg-card"
+                                : isTbd
+                                  ? "border-border/30 bg-muted/20"
+                                  : "border-border/60 bg-card"
+                          }`}
+                          style={{ height: CARD_H, width: CARD_W }}
+                        >
+                          {/* Fighter A row */}
+                          <div
+                            className={`flex items-center gap-1.5 px-2.5 border-b ${
+                              aWins ? "bg-primary/10" : done && b.winner_id ? "opacity-40" : ""
+                            }`}
+                            style={{ height: rowH }}
+                          >
                             <Avatar className="h-5 w-5 shrink-0">
                               <AvatarImage src={b.fighter_a_avatar ?? undefined} />
-                              <AvatarFallback className="text-[8px]">{initials(b.fighter_a_name)}</AvatarFallback>
+                              <AvatarFallback className="text-[8px] font-bold">{initials(b.fighter_a_name)}</AvatarFallback>
                             </Avatar>
-                            <span className={`flex-1 truncate text-[11px] leading-tight ${aWins ? "font-semibold text-green-700" : ""}`}>{b.fighter_a_name}</span>
-                            {aWins && <span className="text-green-500 text-[10px] shrink-0">✓</span>}
+                            <span className={`flex-1 truncate text-[11px] leading-tight ${
+                              aWins ? "font-bold text-primary" : isTbd ? "italic text-muted-foreground/60 text-[10px]" : ""
+                            }`}>
+                              {b.fighter_a_name}
+                            </span>
+                            {aWins && <span className="text-primary text-[10px] shrink-0 font-bold">✓</span>}
                           </div>
-                          <div className="flex items-center justify-between border-b bg-muted/20 px-2" style={{ height: vsH }}>
-                            <span className="text-[8px] text-muted-foreground font-bold tracking-widest">VS</span>
-                            {done && b.method && <span className="text-[8px] text-muted-foreground">{b.method}·R{b.round}</span>}
+                          {/* VS bar */}
+                          <div className="flex items-center justify-between border-b px-2.5 bg-muted/30" style={{ height: vsH }}>
+                            <span className="text-[8px] text-muted-foreground/50 font-black tracking-[0.2em]">VS</span>
+                            {done && b.method && (
+                              <span className="text-[9px] text-muted-foreground font-semibold">
+                                {b.method} · R{b.round}
+                              </span>
+                            )}
+                            {!done && !isTbd && (
+                              <span className="text-[8px] text-blue-400/60 font-medium tracking-wide">Zakazano</span>
+                            )}
                           </div>
-                          <div className={`flex items-center gap-1.5 px-2 ${bWins ? "bg-green-500/10" : done && b.winner_id ? "opacity-50" : ""}`} style={{ height: rowH }}>
+                          {/* Fighter B row */}
+                          <div
+                            className={`flex items-center gap-1.5 px-2.5 ${
+                              bWins ? "bg-primary/10" : done && b.winner_id ? "opacity-40" : ""
+                            }`}
+                            style={{ height: rowH }}
+                          >
                             <Avatar className="h-5 w-5 shrink-0">
                               <AvatarImage src={b.fighter_b_avatar ?? undefined} />
-                              <AvatarFallback className="text-[8px]">{initials(b.fighter_b_name)}</AvatarFallback>
+                              <AvatarFallback className="text-[8px] font-bold">{initials(b.fighter_b_name)}</AvatarFallback>
                             </Avatar>
-                            <span className={`flex-1 truncate text-[11px] leading-tight ${bWins ? "font-semibold text-green-700" : !b.fighter_b_id ? "italic text-muted-foreground" : ""}`}>{b.fighter_b_name}</span>
-                            {bWins && <span className="text-green-500 text-[10px] shrink-0">✓</span>}
+                            <span className={`flex-1 truncate text-[11px] leading-tight ${
+                              bWins ? "font-bold text-primary"
+                              : !b.fighter_b_id || b.fighter_b_id.startsWith("tbd-") ? "italic text-muted-foreground/60 text-[10px]"
+                              : ""
+                            }`}>
+                              {b.fighter_b_name}
+                            </span>
+                            {bWins && <span className="text-primary text-[10px] shrink-0 font-bold">✓</span>}
                           </div>
                         </div>
                       );
                     })}
                   </div>
                 </div>
+                {/* Connectors */}
                 {ri < nRounds - 1 && nConns > 0 && (
-                  <div className="flex flex-col shrink-0" style={{ width: 20, marginTop: topOff + CARD_H / 2, gap: connH }}>
+                  <div
+                    className="flex flex-col shrink-0"
+                    style={{ width: CONN_W, marginTop: topOff + CARD_H / 2, gap: connH }}
+                  >
                     {Array.from({ length: nConns }).map((_, ci) => (
                       <div key={ci} style={{ height: connH }}>
-                        <div className="border-r-2 border-b-2 border-border/60 rounded-br" style={{ height: connH / 2 }} />
-                        <div className="border-r-2 border-t-2 border-border/60 rounded-tr" style={{ height: connH / 2 }} />
+                        <div className="border-r-2 border-b-2 border-primary/20 rounded-br" style={{ height: connH / 2 }} />
+                        <div className="border-r-2 border-t-2 border-primary/20 rounded-tr" style={{ height: connH / 2 }} />
                       </div>
                     ))}
                   </div>
@@ -299,10 +357,64 @@ export default function TournamentDetailPage() {
               <MapPin className="h-4 w-4" />{tournament.location}
             </span>
           )}
-          {tournament.weight_class && (
-            <Badge variant="outline">{tournament.weight_class}</Badge>
+          {tournament.registration_deadline && (
+            <span className="flex items-center gap-1">
+              <Clock className="h-4 w-4" />Rok: {fmt(tournament.registration_deadline)}
+            </span>
+          )}
+          {tournament.max_fighters && (
+            <span className="flex items-center gap-1">
+              <Users2 className="h-4 w-4" />Maks. {tournament.max_fighters} boraca
+            </span>
+          )}
+          {tournament.rules && (
+            <span className="flex items-center gap-1">
+              <ShieldCheck className="h-4 w-4" />{tournament.rules}
+            </span>
           )}
         </div>
+        {tournament.categories?.length > 0 && (
+          <div className="mt-3 overflow-x-auto rounded border border-border/60">
+            <table className="text-xs w-full min-w-max">
+              <thead>
+                <tr className="border-b border-border/60 bg-muted/30">
+                  <th className="text-left px-3 py-2 font-semibold text-muted-foreground">Dobna skupina</th>
+                  <th className="text-left px-3 py-2 font-semibold text-muted-foreground">Kategorije (kg limit)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {AGE_GROUPS.filter((ag) => tournament.categories.some((c) => c.age_group === ag.id)).map((ag, ri) => {
+                  const cats = tournament.categories.filter((c) => c.age_group === ag.id).sort((a, b) => a.weight_limit_kg - b.weight_limit_kg);
+                  return (
+                    <tr key={ag.id} className={ri % 2 === 0 ? "bg-background" : "bg-muted/10"}>
+                      <td className="px-3 py-2 font-medium whitespace-nowrap">
+                        {ag.label} <span className="text-muted-foreground font-normal">({ag.min_age}–{ag.max_age ?? "+"})</span>
+                      </td>
+                      <td className="px-3 py-2">
+                        <div className="flex flex-wrap gap-1">
+                          {cats.map((c) => (
+                            <span key={c.weight_class} className="inline-flex items-center gap-1 border border-border/60 rounded px-1.5 py-0.5 bg-muted/30 text-foreground">
+                              {c.weight_class}
+                              <span className="text-muted-foreground">do {c.weight_limit_kg} kg</span>
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+        {tournament.gender && tournament.gender !== "open" && (
+          <Badge variant="outline" className="border-border/60 mt-2">
+            {tournament.gender === "male" ? "Muško" : "Žensko"}
+          </Badge>
+        )}
+        {tournament.description && (
+          <p className="mt-3 text-sm text-muted-foreground">{tournament.description}</p>
+        )}
 
         {/* Fighter: read-only registration status */}
         {isFighter && myReg && (
@@ -314,37 +426,6 @@ export default function TournamentDetailPage() {
           </div>
         )}
       </div>
-
-      {/* Registered fighters */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
-            Registrirani borci ({registrations.length})
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {registrations.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Nema registriranih boraca.</p>
-          ) : (
-            <div className="divide-y">
-              {registrations.map((r) => (
-                <div key={r.id} className="flex items-center justify-between py-3">
-                  <div>
-                    <p className="font-medium">{r.fighter_name}</p>
-                    {r.weight_class && (
-                      <p className="text-sm text-muted-foreground">{r.weight_class}</p>
-                    )}
-                  </div>
-                  <Badge className={REG_COLORS[r.status]} variant="outline">
-                    {REG_LABELS[r.status] ?? r.status}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
 
       {/* Matches */}
       <Card>
@@ -463,6 +544,37 @@ export default function TournamentDetailPage() {
                   </div>
                 );
               })}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Registered fighters */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            Registrirani borci ({registrations.length})
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {registrations.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Nema registriranih boraca.</p>
+          ) : (
+            <div className="divide-y">
+              {registrations.map((r) => (
+                <div key={r.id} className="flex items-center justify-between py-3">
+                  <div>
+                    <p className="font-medium">{r.fighter_name}</p>
+                    {r.weight_class && (
+                      <p className="text-sm text-muted-foreground">{r.weight_class}</p>
+                    )}
+                  </div>
+                  <Badge className={REG_COLORS[r.status]} variant="outline">
+                    {REG_LABELS[r.status] ?? r.status}
+                  </Badge>
+                </div>
+              ))}
             </div>
           )}
         </CardContent>

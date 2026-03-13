@@ -343,9 +343,9 @@ export default function DashboardPage() {
                     </span>
                   )}
                 </div>
-                {nextTournament.weight_class && (
+                {nextTournament.categories?.length > 0 && (
                   <Badge variant="outline" className="mt-3 border-accent/40 text-accent text-xs">
-                    {nextTournament.weight_class}
+                    {nextTournament.categories.length} {nextTournament.categories.length === 1 ? "kategorija" : "kategorije"}
                   </Badge>
                 )}
                 <div className="mt-4 flex items-center gap-1 text-xs text-accent/70 group-hover:text-accent transition-colors font-semibold">

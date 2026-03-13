@@ -1,4 +1,4 @@
-import { LayoutDashboard, Newspaper, Users, Trophy, Settings, Building2, Calendar, Flame, ShieldCheck } from "lucide-react";
+import { LayoutDashboard, Newspaper, Users, Trophy, Settings, Building2, Calendar, ShieldCheck } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -33,18 +33,20 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       {/* Brand mark */}
-      <SidebarHeader className="border-b border-sidebar-border px-4 py-4">
+      <SidebarHeader className="border-b border-sidebar-border px-3 py-3">
         <div className={`flex items-center gap-3 ${collapsed ? "justify-center" : ""}`}>
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary shadow-glow-primary">
-            <Flame className="h-5 w-5 text-primary-foreground" />
-          </div>
+          <img
+            src="/assets/hrvatski_mma_savez_logo.png"
+            alt="Hrvatski MMA Savez"
+            className="h-9 w-9 shrink-0 object-contain"
+          />
           {!collapsed && (
             <div className="leading-tight">
-              <p className="font-display text-base font-black tracking-widest text-sidebar-accent-foreground uppercase">
-                Antigravity
+              <p className="font-display text-sm font-black tracking-widest text-sidebar-accent-foreground uppercase">
+                Hrvatski MMA
               </p>
-              <p className="text-[11px] text-sidebar-foreground/60 uppercase tracking-wider">
-                MMA Savez
+              <p className="text-[10px] text-sidebar-foreground/60 uppercase tracking-wider">
+                Savez
               </p>
             </div>
           )}

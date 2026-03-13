@@ -9,6 +9,32 @@ export type TournamentStatus   = "upcoming" | "active" | "completed";
 export type RegistrationStatus = "pending" | "approved" | "rejected";
 export type BoutStatus         = "scheduled" | "completed";
 export type SessionType        = "striking" | "grappling" | "sparring" | "conditioning" | "open_mat" | "other";
+export type AgeGroup           = "kadeti" | "juniori" | "seniori" | "veterani";
+
+export const AGE_GROUPS: { id: AgeGroup; label: string; min_age: number; max_age: number | null }[] = [
+  { id: "kadeti",   label: "Kadeti",   min_age: 14, max_age: 17 },
+  { id: "juniori",  label: "Juniori",  min_age: 18, max_age: 20 },
+  { id: "seniori",  label: "Seniori",  min_age: 21, max_age: 34 },
+  { id: "veterani", label: "Veterani", min_age: 35, max_age: null },
+];
+
+export const WEIGHT_CLASS_DATA: { name: string; short: string; limit_kg: number }[] = [
+  { name: "Strawweight",       short: "Straw",   limit_kg: 52.2  },
+  { name: "Flyweight",         short: "Fly",     limit_kg: 56.7  },
+  { name: "Bantamweight",      short: "Bantam",  limit_kg: 61.2  },
+  { name: "Featherweight",     short: "Feather", limit_kg: 65.8  },
+  { name: "Lightweight",       short: "Light",   limit_kg: 70.3  },
+  { name: "Welterweight",      short: "Welter",  limit_kg: 77.1  },
+  { name: "Middleweight",      short: "Middle",  limit_kg: 83.9  },
+  { name: "Light Heavyweight", short: "L.Heavy", limit_kg: 93.0  },
+  { name: "Heavyweight",       short: "Heavy",   limit_kg: 120.2 },
+];
+
+export interface TournamentCategory {
+  age_group:      AgeGroup;
+  weight_class:   string;   // matches WEIGHT_CLASS_DATA[n].name
+  weight_limit_kg: number;
+}
 
 export interface Profile {
   id: string;
@@ -38,6 +64,7 @@ export interface Fighter {
   losses: number;
   draws: number;
   date_of_birth: string | null;   // "YYYY-MM-DD"
+  oib: string | null;             // Croatian personal ID (11 digits)
   nationality: string | null;
   bio: string | null;
 }
@@ -45,12 +72,18 @@ export interface Fighter {
 export interface Tournament {
   id: string;
   name: string;
-  date: string | null;            // "YYYY-MM-DD"
+  date: string | null;                    // "YYYY-MM-DD"
   location: string | null;
-  weight_class: string | null;
+  categories: TournamentCategory[];       // age group × weight class combos
   status: TournamentStatus;
   created_by: string | null;
   created_at: string;
+  // extended fields
+  description: string | null;
+  registration_deadline: string | null;   // "YYYY-MM-DD"
+  max_fighters: number | null;
+  rules: string | null;
+  gender: "male" | "female" | "open" | null;
 }
 
 export interface TournamentRegistration {
@@ -132,6 +165,15 @@ export const EXT_NAMES: Record<string, string> = {
   "ext-3": "Karlo Vujanović",
   "ext-4": "Mirko Grgić",
   "ext-5": "Luka Stanković",
+  // bracket TBD placeholders
+  "tbd-qf7": "Pobjednik Boja 7",
+  "tbd-qf8": "Pobjednik Boja 8",
+  "tbd-sf1": "Pobjednik QF 1",
+  "tbd-sf2": "Pobjednik QF 2",
+  "tbd-sf3": "Pobjednik QF 3",
+  "tbd-sf4": "Pobjednik QF 4",
+  "tbd-f1":  "Pobjednik SF 1",
+  "tbd-f2":  "Pobjednik SF 2",
 };
 
 export function getFighterName(id: string | null): string {
@@ -192,44 +234,127 @@ export const CLUBS: Club[] = [
 ];
 
 export const FIGHTERS: Fighter[] = [
-  { id: "3",  club_id: "club-2", weight_class: "Middleweight",    wins: 8,  losses: 2, draws: 0, date_of_birth: "1998-04-15", nationality: "Croatia", bio: "Dinamičan striker s odličnim clinch radom. Trenira od 2021. godine." },
-  { id: "4",  club_id: "club-2", weight_class: "Lightweight",     wins: 12, losses: 1, draws: 1, date_of_birth: "1996-09-22", nationality: "Croatia", bio: "Veteran domaće scene, bivši prvak regije u Lightweightu. Specijalist za takedowne i ground and pound." },
-  { id: "5",  club_id: "club-2", weight_class: "Welterweight",    wins: 5,  losses: 3, draws: 0, date_of_birth: "2001-02-08", nationality: "Croatia", bio: "Mladi Welterweight s velikim potencijalom. Dolazi iz BJJ background-a." },
-  { id: "6",  club_id: "club-2", weight_class: "Bantamweight",    wins: 7,  losses: 0, draws: 0, date_of_birth: "2000-11-30", nationality: "Croatia", bio: "Neporaženi Bantamweight i ponos kluba. Brz, eksplozivan i precizan." },
-  { id: "7",  club_id: "club-2", weight_class: "Heavyweight",     wins: 3,  losses: 4, draws: 1, date_of_birth: "1994-07-19", nationality: "Croatia", bio: "Iskusan Heavyweight koji uči i raste iz svake borbe." },
-  { id: "8",  club_id: "club-1", weight_class: "Featherweight",   wins: 6,  losses: 2, draws: 0, date_of_birth: "1999-03-12", nationality: "Croatia", bio: "Brz i tehnički Featherweight. Odličan u stand-up borbi, radi na ground igri." },
-  { id: "9",  club_id: "club-1", weight_class: "Lightweight",     wins: 4,  losses: 3, draws: 1, date_of_birth: "2000-08-25", nationality: "Croatia", bio: "Borbeni Lightweight koji nikad ne odustaje. Odlična izdržljivost i čvrsta brada." },
-  { id: "10", club_id: "club-1", weight_class: "Welterweight",    wins: 9,  losses: 1, draws: 0, date_of_birth: "1997-05-18", nationality: "Croatia", bio: "Dominantni Welterweight. Specijalist za grappling i rear-naked choke." },
+  { id: "3",  club_id: "club-2", weight_class: "Middleweight",    wins: 8,  losses: 2, draws: 0, date_of_birth: "1998-04-15", oib: "12345678901", nationality: "Croatia", bio: "Dinamičan striker s odličnim clinch radom. Trenira od 2021. godine." },
+  { id: "4",  club_id: "club-2", weight_class: "Lightweight",     wins: 12, losses: 1, draws: 1, date_of_birth: "1996-09-22", oib: "23456789012", nationality: "Croatia", bio: "Veteran domaće scene, bivši prvak regije u Lightweightu. Specijalist za takedowne i ground and pound." },
+  { id: "5",  club_id: "club-2", weight_class: "Welterweight",    wins: 5,  losses: 3, draws: 0, date_of_birth: "2001-02-08", oib: "34567890123", nationality: "Croatia", bio: "Mladi Welterweight s velikim potencijalom. Dolazi iz BJJ background-a." },
+  { id: "6",  club_id: "club-2", weight_class: "Bantamweight",    wins: 7,  losses: 0, draws: 0, date_of_birth: "2000-11-30", oib: "45678901234", nationality: "Croatia", bio: "Neporaženi Bantamweight i ponos kluba. Brz, eksplozivan i precizan." },
+  { id: "7",  club_id: "club-2", weight_class: "Heavyweight",     wins: 3,  losses: 4, draws: 1, date_of_birth: "1994-07-19", oib: "56789012345", nationality: "Croatia", bio: "Iskusan Heavyweight koji uči i raste iz svake borbe." },
+  { id: "8",  club_id: "club-1", weight_class: "Featherweight",   wins: 6,  losses: 2, draws: 0, date_of_birth: "1999-03-12", oib: "67890123456", nationality: "Croatia", bio: "Brz i tehnički Featherweight. Odličan u stand-up borbi, radi na ground igri." },
+  { id: "9",  club_id: "club-1", weight_class: "Lightweight",     wins: 4,  losses: 3, draws: 1, date_of_birth: "2000-08-25", oib: "78901234567", nationality: "Croatia", bio: "Borbeni Lightweight koji nikad ne odustaje. Odlična izdržljivost i čvrsta brada." },
+  { id: "10", club_id: "club-1", weight_class: "Welterweight",    wins: 9,  losses: 1, draws: 0, date_of_birth: "1997-05-18", oib: "89012345678", nationality: "Croatia", bio: "Dominantni Welterweight. Specijalist za grappling i rear-naked choke." },
   // MMA Klub Ban fighters
-  { id: "12", club_id: "club-3", weight_class: "Lightweight",     wins: 6,  losses: 2, draws: 1, date_of_birth: "1999-06-14", nationality: "Croatia", bio: "Eksplozivan Lightweight iz Splita. Odlična osnovica boksača, radi na ground igri." },
-  { id: "13", club_id: "club-3", weight_class: "Middleweight",    wins: 4,  losses: 1, draws: 0, date_of_birth: "2000-03-21", nationality: "Croatia", bio: "Perspektivan model striker s odličnom footwork tehnikom. Brze ruke, brze noge." },
-  { id: "14", club_id: "club-3", weight_class: "Welterweight",    wins: 9,  losses: 3, draws: 0, date_of_birth: "1996-11-05", nationality: "Croatia", bio: "Iskusan veteran kluba Ban. Clinch specijalist koji je dominirao regionalnoj sceni." },
-  { id: "15", club_id: "club-3", weight_class: "Featherweight",   wins: 2,  losses: 0, draws: 0, date_of_birth: "2003-07-17", nationality: "Croatia", bio: "Mladi talent iz Splita. Neporažen u prvim profesionalnim nastupima, veliki potencijal." },
+  { id: "12", club_id: "club-3", weight_class: "Lightweight",     wins: 6,  losses: 2, draws: 1, date_of_birth: "1999-06-14", oib: "90123456789", nationality: "Croatia", bio: "Eksplozivan Lightweight iz Splita. Odlična osnovica boksača, radi na ground igri." },
+  { id: "13", club_id: "club-3", weight_class: "Middleweight",    wins: 4,  losses: 1, draws: 0, date_of_birth: "2000-03-21", oib: "01234567890", nationality: "Croatia", bio: "Perspektivan model striker s odličnom footwork tehnikom. Brze ruke, brze noge." },
+  { id: "14", club_id: "club-3", weight_class: "Welterweight",    wins: 9,  losses: 3, draws: 0, date_of_birth: "1996-11-05", oib: "11223344556", nationality: "Croatia", bio: "Iskusan veteran kluba Ban. Clinch specijalist koji je dominirao regionalnoj sceni." },
+  { id: "15", club_id: "club-3", weight_class: "Featherweight",   wins: 2,  losses: 0, draws: 0, date_of_birth: "2003-07-17", oib: "22334455667", nationality: "Croatia", bio: "Mladi talent iz Splita. Neporažen u prvim profesionalnim nastupima, veliki potencijal." },
   // Sport Klub Zagreb fighters
-  { id: "17", club_id: "club-4", weight_class: "Bantamweight",    wins: 5,  losses: 2, draws: 1, date_of_birth: "2001-01-30", nationality: "Croatia", bio: "Tehnički Bantamweight s odličnom BJJ podlogom. Tihi natjecatelj koji govori kroz performanse." },
-  { id: "18", club_id: "club-4", weight_class: "Heavyweight",     wins: 7,  losses: 1, draws: 0, date_of_birth: "1995-09-08", nationality: "Croatia", bio: "Dominantni Heavyweight Sport Kluba. Snažan grappler s knockout udarcem." },
-  { id: "19", club_id: "club-4", weight_class: "Welterweight",    wins: 3,  losses: 3, draws: 2, date_of_birth: "1999-04-22", nationality: "Croatia", bio: "Borbeni Welterweight koji uvijek ide na pobjedu. Nikad ne odustaje, voljan riskirati." },
-  { id: "20", club_id: "club-4", weight_class: "Light Heavyweight",wins: 8,  losses: 0, draws: 1, date_of_birth: "1997-12-03", nationality: "Croatia", bio: "Ponos Sport Kluba Zagreb. Neporažen u Light Heavyweightu, sprema se za veliki korak." },
+  { id: "17", club_id: "club-4", weight_class: "Bantamweight",    wins: 5,  losses: 2, draws: 1, date_of_birth: "2001-01-30", oib: "33445566778", nationality: "Croatia", bio: "Tehnički Bantamweight s odličnom BJJ podlogom. Tihi natjecatelj koji govori kroz performanse." },
+  { id: "18", club_id: "club-4", weight_class: "Heavyweight",     wins: 7,  losses: 1, draws: 0, date_of_birth: "1995-09-08", oib: "44556677889", nationality: "Croatia", bio: "Dominantni Heavyweight Sport Kluba. Snažan grappler s knockout udarcem." },
+  { id: "19", club_id: "club-4", weight_class: "Welterweight",    wins: 3,  losses: 3, draws: 2, date_of_birth: "1999-04-22", oib: "55667788990", nationality: "Croatia", bio: "Borbeni Welterweight koji uvijek ide na pobjedu. Nikad ne odustaje, voljan riskirati." },
+  { id: "20", club_id: "club-4", weight_class: "Light Heavyweight",wins: 8,  losses: 0, draws: 1, date_of_birth: "1997-12-03", oib: "66778899001", nationality: "Croatia", bio: "Ponos Sport Kluba Zagreb. Neporažen u Light Heavyweightu, sprema se za veliki korak." },
 ];
 
 export const TOURNAMENTS: Tournament[] = [
-  { id: "t-1", name: "Otvoreno Prvenstvo Hrvatske u MMA", date: "2026-04-15", location: "Osijek, Hrvatska",  weight_class: "Lightweight",  status: "upcoming",  created_by: "1", created_at: "2026-03-01T08:00:00Z" },
-  { id: "t-2", name: "Zagreb Fight Night #3",             date: "2025-11-22", location: "Zagreb, Hrvatska",  weight_class: "Middleweight", status: "completed", created_by: "1", created_at: "2025-10-01T08:00:00Z" },
-  { id: "t-3", name: "Adria MMA Championship",           date: "2026-05-10", location: "Pula, Hrvatska",    weight_class: "Welterweight", status: "upcoming",  created_by: "1", created_at: "2026-03-10T10:00:00Z" },
-  { id: "t-4", name: "Gladiator Fight Night #8",          date: "2026-06-25", location: "Dubrovnik, Hrvatska", weight_class: "Heavyweight",   status: "upcoming",  created_by: "1", created_at: "2026-03-11T12:00:00Z" },
-  { id: "t-5", name: "FNC 14",                            date: "2025-12-15", location: "Sarajevo, BiH",       weight_class: "Featherweight", status: "completed", created_by: "1", created_at: "2025-11-20T09:00:00Z" },
-  { id: "t-6", name: "Trofej Slobodne Dalmacije",        date: "2026-01-20", location: "Split, Hrvatska",    weight_class: "Bantamweight", status: "completed", created_by: "1", created_at: "2025-12-15T15:00:00Z" },
+  {
+    id: "t-1", name: "Otvoreno Prvenstvo Hrvatske u MMA", date: "2026-04-15", location: "Osijek, Hrvatska",
+    status: "upcoming", created_by: "1", created_at: "2026-03-01T08:00:00Z",
+    description: "Godišnje otvoreno državno natjecanje u MMA-u. Otvoreno za sve klubove članice Saveza.",
+    registration_deadline: "2026-04-01", max_fighters: 64, rules: "IMMAF Rules", gender: "male",
+    categories: [
+      { age_group: "kadeti",  weight_class: "Bantamweight",      weight_limit_kg: 61.2 },
+      { age_group: "kadeti",  weight_class: "Featherweight",     weight_limit_kg: 65.8 },
+      { age_group: "kadeti",  weight_class: "Lightweight",       weight_limit_kg: 70.3 },
+      { age_group: "juniori", weight_class: "Lightweight",       weight_limit_kg: 70.3 },
+      { age_group: "juniori", weight_class: "Welterweight",      weight_limit_kg: 77.1 },
+      { age_group: "juniori", weight_class: "Middleweight",      weight_limit_kg: 83.9 },
+      { age_group: "seniori", weight_class: "Lightweight",       weight_limit_kg: 70.3 },
+      { age_group: "seniori", weight_class: "Welterweight",      weight_limit_kg: 77.1 },
+      { age_group: "seniori", weight_class: "Middleweight",      weight_limit_kg: 83.9 },
+      { age_group: "seniori", weight_class: "Light Heavyweight", weight_limit_kg: 93.0 },
+    ],
+  },
+  {
+    id: "t-2", name: "Zagreb Fight Night #3", date: "2025-11-22", location: "Zagreb, Hrvatska",
+    status: "completed", created_by: "1", created_at: "2025-10-01T08:00:00Z",
+    description: "Treće izdanje popularnog noćnog spektakla u Zagrebu.",
+    registration_deadline: "2025-11-10", max_fighters: 16, rules: "Local Rules", gender: "open",
+    categories: [
+      { age_group: "seniori", weight_class: "Middleweight", weight_limit_kg: 83.9 },
+    ],
+  },
+  {
+    id: "t-3", name: "Adria MMA Championship", date: "2026-05-10", location: "Pula, Hrvatska",
+    status: "upcoming", created_by: "1", created_at: "2026-03-10T10:00:00Z",
+    description: "Regionalno natjecanje koje okuplja klubove iz Hrvatske, Slovenije i Bosne.",
+    registration_deadline: "2026-04-25", max_fighters: 48, rules: "IMMAF Rules", gender: "open",
+    categories: [
+      { age_group: "juniori", weight_class: "Bantamweight",  weight_limit_kg: 61.2 },
+      { age_group: "juniori", weight_class: "Lightweight",   weight_limit_kg: 70.3 },
+      { age_group: "juniori", weight_class: "Welterweight",  weight_limit_kg: 77.1 },
+      { age_group: "seniori", weight_class: "Bantamweight",  weight_limit_kg: 61.2 },
+      { age_group: "seniori", weight_class: "Lightweight",   weight_limit_kg: 70.3 },
+      { age_group: "seniori", weight_class: "Welterweight",  weight_limit_kg: 77.1 },
+    ],
+  },
+  {
+    id: "t-4", name: "Gladiator Fight Night #8", date: "2026-06-25", location: "Dubrovnik, Hrvatska",
+    status: "upcoming", created_by: "1", created_at: "2026-03-11T12:00:00Z",
+    description: "Ekskluzivni turnir teških kategorija uz spektakularnu lokaciju u Dubrovniku.",
+    registration_deadline: "2026-06-10", max_fighters: 16, rules: "Local Rules", gender: "male",
+    categories: [
+      { age_group: "seniori", weight_class: "Light Heavyweight", weight_limit_kg: 93.0  },
+      { age_group: "seniori", weight_class: "Heavyweight",       weight_limit_kg: 120.2 },
+      { age_group: "veterani", weight_class: "Heavyweight",      weight_limit_kg: 120.2 },
+    ],
+  },
+  {
+    id: "t-5", name: "FNC 14", date: "2025-12-15", location: "Sarajevo, BiH",
+    status: "completed", created_by: "1", created_at: "2025-11-20T09:00:00Z",
+    description: null, registration_deadline: "2025-12-01", max_fighters: 32, rules: "IMMAF Rules", gender: "open",
+    categories: [
+      { age_group: "seniori", weight_class: "Bantamweight",  weight_limit_kg: 61.2 },
+      { age_group: "seniori", weight_class: "Featherweight", weight_limit_kg: 65.8 },
+    ],
+  },
+  {
+    id: "t-6", name: "Trofej Slobodne Dalmacije", date: "2026-01-20", location: "Split, Hrvatska",
+    status: "completed", created_by: "1", created_at: "2025-12-15T15:00:00Z",
+    description: "Tradicionalni trofej koji se već 12 godina održava u Splitu.",
+    registration_deadline: "2026-01-10", max_fighters: 32, rules: "Local Rules", gender: "open",
+    categories: [
+      { age_group: "kadeti",  weight_class: "Bantamweight",  weight_limit_kg: 61.2 },
+      { age_group: "kadeti",  weight_class: "Featherweight", weight_limit_kg: 65.8 },
+      { age_group: "seniori", weight_class: "Bantamweight",  weight_limit_kg: 61.2 },
+      { age_group: "seniori", weight_class: "Featherweight", weight_limit_kg: 65.8 },
+      { age_group: "seniori", weight_class: "Lightweight",   weight_limit_kg: 70.3 },
+    ],
+  },
 ];
 
 export const REGISTRATIONS: TournamentRegistration[] = [
-  { id: "reg-1", tournament_id: "t-1", fighter_id: "6", status: "approved", registered_at: "2026-03-02T09:00:00Z" },
-  { id: "reg-2", tournament_id: "t-1", fighter_id: "4", status: "approved", registered_at: "2026-03-03T10:00:00Z" },
-  { id: "reg-3", tournament_id: "t-1", fighter_id: "3", status: "pending",  registered_at: "2026-03-06T14:00:00Z" },
-  { id: "reg-4", tournament_id: "t-2", fighter_id: "6", status: "approved", registered_at: "2025-11-01T09:00:00Z" },
-  { id: "reg-5", tournament_id: "t-2", fighter_id: "4", status: "approved", registered_at: "2025-11-01T10:00:00Z" },
-  { id: "reg-6", tournament_id: "t-2", fighter_id: "3", status: "approved", registered_at: "2025-11-01T11:00:00Z" },
-  { id: "reg-7", tournament_id: "t-2", fighter_id: "5", status: "approved", registered_at: "2025-11-01T12:00:00Z" },
-  { id: "reg-8", tournament_id: "t-2", fighter_id: "7", status: "approved", registered_at: "2025-11-01T13:00:00Z" },
+  // Otvoreno Prvenstvo (t-1) — all fighters registered and approved
+  { id: "reg-1",  tournament_id: "t-1", fighter_id: "6",  status: "approved", registered_at: "2026-03-02T09:00:00Z" },
+  { id: "reg-2",  tournament_id: "t-1", fighter_id: "4",  status: "approved", registered_at: "2026-03-03T10:00:00Z" },
+  { id: "reg-3",  tournament_id: "t-1", fighter_id: "3",  status: "approved", registered_at: "2026-03-06T14:00:00Z" },
+  { id: "reg-9",  tournament_id: "t-1", fighter_id: "5",  status: "approved", registered_at: "2026-03-04T09:00:00Z" },
+  { id: "reg-10", tournament_id: "t-1", fighter_id: "7",  status: "approved", registered_at: "2026-03-04T10:00:00Z" },
+  { id: "reg-11", tournament_id: "t-1", fighter_id: "8",  status: "approved", registered_at: "2026-03-05T09:00:00Z" },
+  { id: "reg-12", tournament_id: "t-1", fighter_id: "9",  status: "approved", registered_at: "2026-03-05T10:00:00Z" },
+  { id: "reg-13", tournament_id: "t-1", fighter_id: "10", status: "approved", registered_at: "2026-03-05T11:00:00Z" },
+  { id: "reg-14", tournament_id: "t-1", fighter_id: "12", status: "approved", registered_at: "2026-03-06T09:00:00Z" },
+  { id: "reg-15", tournament_id: "t-1", fighter_id: "13", status: "approved", registered_at: "2026-03-06T10:00:00Z" },
+  { id: "reg-16", tournament_id: "t-1", fighter_id: "14", status: "approved", registered_at: "2026-03-06T11:00:00Z" },
+  { id: "reg-17", tournament_id: "t-1", fighter_id: "15", status: "approved", registered_at: "2026-03-07T09:00:00Z" },
+  { id: "reg-18", tournament_id: "t-1", fighter_id: "17", status: "approved", registered_at: "2026-03-07T10:00:00Z" },
+  { id: "reg-19", tournament_id: "t-1", fighter_id: "18", status: "approved", registered_at: "2026-03-07T11:00:00Z" },
+  { id: "reg-20", tournament_id: "t-1", fighter_id: "19", status: "approved", registered_at: "2026-03-07T12:00:00Z" },
+  { id: "reg-21", tournament_id: "t-1", fighter_id: "20", status: "approved", registered_at: "2026-03-07T13:00:00Z" },
+  // Zagreb Fight Night #3 (t-2)
+  { id: "reg-4",  tournament_id: "t-2", fighter_id: "6",  status: "approved", registered_at: "2025-11-01T09:00:00Z" },
+  { id: "reg-5",  tournament_id: "t-2", fighter_id: "4",  status: "approved", registered_at: "2025-11-01T10:00:00Z" },
+  { id: "reg-6",  tournament_id: "t-2", fighter_id: "3",  status: "approved", registered_at: "2025-11-01T11:00:00Z" },
+  { id: "reg-7",  tournament_id: "t-2", fighter_id: "5",  status: "approved", registered_at: "2025-11-01T12:00:00Z" },
+  { id: "reg-8",  tournament_id: "t-2", fighter_id: "7",  status: "approved", registered_at: "2025-11-01T13:00:00Z" },
 ];
 
 export const BOUTS: Bout[] = [
@@ -239,9 +364,26 @@ export const BOUTS: Bout[] = [
   { id: "b-3", tournament_id: "t-2", fighter_a_id: "3", fighter_b_id: "ext-3", winner_id: "3",     method: "Submission", round: 2, bout_order: 3, status: "completed" },
   { id: "b-4", tournament_id: "t-2", fighter_a_id: "7", fighter_b_id: "ext-4", winner_id: "ext-4", method: "TKO",        round: 2, bout_order: 4, status: "completed" },
   { id: "b-5", tournament_id: "t-2", fighter_a_id: "5", fighter_b_id: "ext-5", winner_id: "5",     method: "Decision",   round: 3, bout_order: 5, status: "completed" },
-  // Otvoreno Prvenstvo (t-1) — upcoming, opponents TBD
-  { id: "b-6", tournament_id: "t-1", fighter_a_id: "6", fighter_b_id: null, winner_id: null, method: null, round: null, bout_order: 1, status: "scheduled" },
-  { id: "b-7", tournament_id: "t-1", fighter_a_id: "4", fighter_b_id: null, winner_id: null, method: null, round: null, bout_order: 2, status: "scheduled" },
+  // Otvoreno Prvenstvo (t-1) — 16-fighter bracket
+  // ── Round 1/16 (8 bouts) ──────────────────────────────────────
+  { id: "b-6",  tournament_id: "t-1", fighter_a_id: "6",       fighter_b_id: "17",      winner_id: "6",   method: "TKO",        round: 1, bout_order: 1,  status: "completed" },
+  { id: "b-7",  tournament_id: "t-1", fighter_a_id: "4",       fighter_b_id: "12",      winner_id: "4",   method: "Decision",   round: 3, bout_order: 2,  status: "completed" },
+  { id: "b-8",  tournament_id: "t-1", fighter_a_id: "10",      fighter_b_id: "14",      winner_id: "10",  method: "Submission", round: 2, bout_order: 3,  status: "completed" },
+  { id: "b-9",  tournament_id: "t-1", fighter_a_id: "3",       fighter_b_id: "13",      winner_id: "3",   method: "TKO",        round: 2, bout_order: 4,  status: "completed" },
+  { id: "b-10", tournament_id: "t-1", fighter_a_id: "5",       fighter_b_id: "19",      winner_id: "19",  method: "Decision",   round: 3, bout_order: 5,  status: "completed" },
+  { id: "b-11", tournament_id: "t-1", fighter_a_id: "8",       fighter_b_id: "15",      winner_id: "8",   method: "KO",         round: 1, bout_order: 6,  status: "completed" },
+  { id: "b-12", tournament_id: "t-1", fighter_a_id: "20",      fighter_b_id: "9",       winner_id: null,  method: null,         round: null, bout_order: 7, status: "scheduled" },
+  { id: "b-13", tournament_id: "t-1", fighter_a_id: "18",      fighter_b_id: "7",       winner_id: null,  method: null,         round: null, bout_order: 8, status: "scheduled" },
+  // ── Četvrtfinale (4 bouts) ────────────────────────────────────
+  { id: "b-14", tournament_id: "t-1", fighter_a_id: "6",       fighter_b_id: "4",       winner_id: null,  method: null,         round: null, bout_order: 9,  status: "scheduled" },
+  { id: "b-15", tournament_id: "t-1", fighter_a_id: "10",      fighter_b_id: "3",       winner_id: null,  method: null,         round: null, bout_order: 10, status: "scheduled" },
+  { id: "b-16", tournament_id: "t-1", fighter_a_id: "19",      fighter_b_id: "8",       winner_id: null,  method: null,         round: null, bout_order: 11, status: "scheduled" },
+  { id: "b-17", tournament_id: "t-1", fighter_a_id: "tbd-qf7", fighter_b_id: "tbd-qf8", winner_id: null, method: null,         round: null, bout_order: 12, status: "scheduled" },
+  // ── Polufinale (2 bouts) ──────────────────────────────────────
+  { id: "b-18", tournament_id: "t-1", fighter_a_id: "tbd-sf1", fighter_b_id: "tbd-sf2", winner_id: null, method: null,         round: null, bout_order: 13, status: "scheduled" },
+  { id: "b-19", tournament_id: "t-1", fighter_a_id: "tbd-sf3", fighter_b_id: "tbd-sf4", winner_id: null, method: null,         round: null, bout_order: 14, status: "scheduled" },
+  // ── Finale ────────────────────────────────────────────────────
+  { id: "b-20", tournament_id: "t-1", fighter_a_id: "tbd-f1",  fighter_b_id: "tbd-f2",  winner_id: null, method: null,         round: null, bout_order: 15, status: "scheduled" },
 ];
 
 export const ANNOUNCEMENTS: Announcement[] = [

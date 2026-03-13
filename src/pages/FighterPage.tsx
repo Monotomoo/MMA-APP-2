@@ -138,6 +138,27 @@ export default function FighterPage() {
         </div>
       </div>
 
+      {/* OIB / sensitive info — admin and coach only */}
+      {(isAdmin || isCoach) && (
+        <Card>
+          <CardHeader><CardTitle className="text-base">Osobni podaci</CardTitle></CardHeader>
+          <CardContent className="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide mb-0.5">OIB</p>
+              <p className="font-mono font-medium">{fighter.oib ?? <span className="text-muted-foreground italic">nije unesen</span>}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide mb-0.5">Datum rođenja</p>
+              <p className="font-medium">{fighter.date_of_birth ? fmt(fighter.date_of_birth) : <span className="text-muted-foreground italic">nije unesen</span>}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide mb-0.5">Nacionalnost</p>
+              <p className="font-medium">{fighter.nationality ?? <span className="text-muted-foreground italic">—</span>}</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Bio */}
       {fighter.bio && (
         <Card>
